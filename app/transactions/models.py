@@ -2,7 +2,7 @@ from datetime import datetime
 
 from .. import db
 
-class Transactions(db.Model):
+class Transaction(db.Model):
 	
 	__tablename__ = 'transactions'
 
