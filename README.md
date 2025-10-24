@@ -24,3 +24,18 @@ Please ask information to the project owner.
 ```bash
 flask run
 ```
+
+## Database Migration
+
+Remember to import your models in `migrations/env.py` to enable Alembic to detect model changes.
+
+```bash
+# Step 1. Initialize migration environment (only once)
+flask db init          
+
+# Step 2. Create a new migration
+flask db migrate -m "Add your migration message here"
+
+# Step 3. Apply the migration to the database
+flask db upgrade
+```

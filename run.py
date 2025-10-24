@@ -1,6 +1,7 @@
 import os
 
 from app import create_app
+from app.transactions.models import Transactions
 from config import config
 
 ENV = os.getenv('FLASK_ENV', 'development')
