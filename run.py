@@ -1,7 +1,7 @@
 import os
 
 from app import create_app, db
-from app.transactions.models import Transaction
+from app.transactions.models import Transaction, TransactionCategory
 from config import config
 
 ENV = os.getenv('FLASK_ENV', 'development')
@@ -17,4 +17,4 @@ app = create_app(app_config)
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(db=db, Transaction=Transaction)
+    return dict(db=db, Transaction=Transaction, TransactionCategory=TransactionCategory)

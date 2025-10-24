@@ -23,8 +23,13 @@
                         <input type="text" class="form-control" id="item" name="item" required>
                     </div>
                     <div class="mb-3">
-                        <label for="type" class="form-label">Type</label>
-                        <input type="text" class="form-control" id="type" name="type" required>
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">請選擇</option>
+                            {% for c in categories %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="expense" class="form-label">Expense</label>
@@ -32,7 +37,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="date" class="form-label">Date</label>
-                        <input type="datetime-local" class="form-control" id="date" name="date">
+                        <input type="date" class="form-control" id="date" name="date">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -48,7 +53,7 @@
     <thead>
         <tr>
             <th>Item</th>
-            <th>Type</th>
+            <th>Category</th>
             <th>Expense</th>
             <th>Date</th>
         </tr>
@@ -57,9 +62,9 @@
         {% for t in transactions %}
         <tr>
             <td>{{ t.item }}</td>
-            <td>{{ t.type }}</td>
+            <td>{{ t.category.name if t.category else '' }}</td>
             <td>{{ t.expense }}</td>
-            <td>{{ t.transaction_at.strftime('%Y-%m-%d %H:%M') if t.transaction_at else '' }}</td>
+            <td>{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}</td>
         </tr>
         {% endfor %}
     </tbody>
