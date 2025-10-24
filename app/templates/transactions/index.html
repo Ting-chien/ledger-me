@@ -1,32 +1,67 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
-        <h1 class="mb-0">Transactions</h1>
-        <a href="{{ url_for('transactions.index') }}" class="btn btn-primary">新增交易</a>
+<div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+    <h1 class="mb-0">Transactions</h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+        data-bs-target="#createTransactionModal">新增交易</button>
+</div>
+
+<!-- Create Transaction Modal -->
+<div class="modal fade" id="createTransactionModal" tabindex="-1" aria-labelledby="createTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('transactions.index') }}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTransactionModalLabel">新增交易</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item" class="form-label">Item</label>
+                        <input type="text" class="form-control" id="item" name="item" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <input type="text" class="form-control" id="type" name="type" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expense" class="form-label">Expense</label>
+                        <input type="number" class="form-control" id="expense" name="expense" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="datetime-local" class="form-control" id="date" name="date">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">送出</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Item</th>
-                <th>Type</th>
-                <th>Expense</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for t in transactions %}
-            <tr>
-                <td>{{ t.id }}</td>
-                <td>{{ t.item }}</td>
-                <td>{{ t.type }}</td>
-                <td>{{ t.expense }}</td>
-                <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else '' }}</td>
-                <td>{{ t.updated_at.strftime('%Y-%m-%d %H:%M') if t.updated_at else '' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Expense</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.item }}</td>
+            <td>{{ t.type }}</td>
+            <td>{{ t.expense }}</td>
+            <td>{{ t.transaction_at.strftime('%Y-%m-%d %H:%M') if t.transaction_at else '' }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

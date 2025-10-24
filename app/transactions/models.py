@@ -10,5 +10,6 @@ class Transaction(db.Model):
 	item = db.Column(db.String(128), nullable=False)
 	type = db.Column(db.String(64), nullable=False)
 	expense = db.Column(db.Integer, nullable=False)
+	transaction_at = db.Column(db.DateTime, nullable=False)
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
