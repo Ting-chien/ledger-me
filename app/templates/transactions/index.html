@@ -1,5 +1,32 @@
 {% extends "base.html" %}
 
 {% block page_content %}
-    <h1>Transactions</h1>
+    <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
+        <h1 class="mb-0">Transactions</h1>
+        <a href="{{ url_for('transactions.index') }}" class="btn btn-primary">新增交易</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Expense</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in transactions %}
+            <tr>
+                <td>{{ t.id }}</td>
+                <td>{{ t.item }}</td>
+                <td>{{ t.type }}</td>
+                <td>{{ t.expense }}</td>
+                <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else '' }}</td>
+                <td>{{ t.updated_at.strftime('%Y-%m-%d %H:%M') if t.updated_at else '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
