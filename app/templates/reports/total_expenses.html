@@ -7,14 +7,14 @@
   </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('/reports/total-expenses')
+window.fetchAndRenderTotalExpense = function(range = 'month') {
+  fetch(`/reports/total-expenses?range=${range}`)
     .then(response => response.json())
     .then(data => {
-      document.getElementById('total-expenses-value').textContent = '$' + (data.total_expenses ?? 0).toLocaleString();
+      document.getElementById('total-expenses-value').textContent = '$' + Number(data.total_expenses ?? 0).toLocaleString();
     })
     .catch(() => {
       document.getElementById('total-expenses-value').textContent = '--';
     });
-});
+};
 </script>

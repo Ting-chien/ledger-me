@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from sqlalchemy import func
 
 from . import blueprint
@@ -13,8 +13,32 @@ def index():
 # API endpoint for expenses trend
 @blueprint.route('/expenses-trend')
 def get_expenses_trend():
+	import datetime
+	range_type = request.args.get('range', 'month')
+	today = datetime.date.today()
+	query = Transaction.query
+	if range_type == 'week':
+		# Get the start of this week (Monday)
+		start = today - datetime.timedelta(days=today.weekday())
+		end = start + datetime.timedelta(days=6)
+		query = query.filter(
+			func.date(Transaction.transaction_at) >= start,
+			func.date(Transaction.transaction_at) <= end
+		)
+	else:  # month (default)
+		start = today.replace(day=1)
+		# Next month first day, then minus one day for last day
+		if today.month == 12:
+			next_month = today.replace(year=today.year+1, month=1, day=1)
+		else:
+			next_month = today.replace(month=today.month+1, day=1)
+		end = next_month - datetime.timedelta(days=1)
+		query = query.filter(
+			func.date(Transaction.transaction_at) >= start,
+			func.date(Transaction.transaction_at) <= end
+		)
 	results = (
-		Transaction.query
+		query
 		.with_entities(
 			func.date(Transaction.transaction_at).label('date'),
 			func.sum(Transaction.expense).label('total_expense')
@@ -28,18 +52,49 @@ def get_expenses_trend():
 	return jsonify({"labels": chart_labels, "data": chart_data})
 
 
+
+# Helper for range filter
+def filter_by_range(query, range_type):
+	import datetime
+	today = datetime.date.today()
+	if range_type == 'week':
+		start = today - datetime.timedelta(days=today.weekday())
+		end = start + datetime.timedelta(days=6)
+		query = query.filter(
+			func.date(Transaction.transaction_at) >= start,
+			func.date(Transaction.transaction_at) <= end
+		)
+	else:  # month (default)
+		start = today.replace(day=1)
+		if today.month == 12:
+			next_month = today.replace(year=today.year+1, month=1, day=1)
+		else:
+			next_month = today.replace(month=today.month+1, day=1)
+		end = next_month - datetime.timedelta(days=1)
+		query = query.filter(
+			func.date(Transaction.transaction_at) >= start,
+			func.date(Transaction.transaction_at) <= end
+		)
+	return query
+
 # API endpoint for total expenses
 @blueprint.route('/total-expenses')
 def get_total_expenses():
-	total = Transaction.query.with_entities(func.sum(Transaction.expense)).scalar() or 0
+	range_type = request.args.get('range', 'month')
+	query = Transaction.query
+	query = filter_by_range(query, range_type)
+	total = query.with_entities(func.sum(Transaction.expense)).scalar() or 0
 	return jsonify({"total_expenses": int(total)})
 
 
 # API endpoint for expenses breakdown by category
 @blueprint.route('/expenses-breakdown')
 def get_expenses_breakdown():
+	range_type = request.args.get('range', 'month')
+	query = Transaction.query
+	query = filter_by_range(query, range_type)
 	results = (
-		Transaction.query
+		query
 		.join(TransactionCategory, Transaction.category_id == TransactionCategory.id)
 		.with_entities(TransactionCategory.name, func.sum(Transaction.expense))
 		.group_by(TransactionCategory.name)

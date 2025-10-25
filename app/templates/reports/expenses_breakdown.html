@@ -8,12 +8,14 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('/reports/expenses-breakdown')
+let breakdownChartInstance = null;
+window.fetchAndRenderBreakdown = function(range = 'month') {
+  fetch(`/reports/expenses-breakdown?range=${range}`)
     .then(response => response.json())
     .then(data => {
       const ctx = document.getElementById('expensesBreakdownChart').getContext('2d');
-      new Chart(ctx, {
+      if (breakdownChartInstance) breakdownChartInstance.destroy();
+      breakdownChartInstance = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: data.labels,
@@ -35,11 +37,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     padding: 10,
                     font: { size: 12 }
                 },
-                maxWidth: 300 // 可依需求調整
+                maxWidth: 300
             }
           }
         }
       });
     });
-});
+};
+</script>
 </script>
