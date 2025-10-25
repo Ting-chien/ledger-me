@@ -92,6 +92,28 @@
     </div>
 </div>
 
+<!-- Delete Transaction Modal -->
+<div class="modal fade" id="deleteTransactionModal" tabindex="-1" aria-labelledby="deleteTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="deleteTransactionForm" action="#" method="post">
+                <input type="hidden" name="_method" value="DELETE">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTransactionModalLabel">刪除交易</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>是否確定要刪除該筆交易？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-danger">確定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -119,7 +141,9 @@
                    data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}">
                     <img src="/static/img/update.png" alt="Edit" width="18" height="18">
                 </a>
-                <a href="#" class="btn btn-sm" title="刪除">
+                <a href="#" class="btn btn-sm delete-btn" title="刪除"
+                   data-bs-toggle="modal" data-bs-target="#deleteTransactionModal"
+                   data-id="{{ t.id }}">
                     <img src="/static/img/remove.png" alt="Delete" width="18" height="18">
                 </a>
             </td>
@@ -132,6 +156,8 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        
+        // 編輯
         var editModal = document.getElementById('editTransactionModal');
         var editForm = document.getElementById('editTransactionForm');
         var editBtns = document.querySelectorAll('.edit-btn');
@@ -142,17 +168,36 @@
                 document.getElementById('edit-category').value = btn.getAttribute('data-category');
                 document.getElementById('edit-expense').value = btn.getAttribute('data-expense');
                 document.getElementById('edit-date').value = btn.getAttribute('data-date');
-                // 設定 form action
                 editForm.action = '/transactions/' + btn.getAttribute('data-id');
             });
         });
-        // 送出時用 JS 改為 PUT
         editForm.addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(editForm);
             fetch(editForm.action, {
                 method: 'PUT',
                 body: formData
+            }).then(function(resp) {
+                if (resp.redirected) {
+                    window.location.href = resp.url;
+                } else {
+                    window.location.reload();
+                }
+            });
+        });
+
+        // 刪除
+        var deleteForm = document.getElementById('deleteTransactionForm');
+        var deleteBtns = document.querySelectorAll('.delete-btn');
+        deleteBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                deleteForm.action = '/transactions/' + btn.getAttribute('data-id');
+            });
+        });
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(deleteForm.action, {
+                method: 'DELETE'
             }).then(function(resp) {
                 if (resp.redirected) {
                     window.location.href = resp.url;

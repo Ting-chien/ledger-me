@@ -40,3 +40,11 @@ def update(transaction_id):
     t.transaction_at = transaction_at
     db.session.commit()
     return redirect(url_for("transactions.index"))
+
+
+@blueprint.route("/<int:transaction_id>", methods=["DELETE"])
+def delete(transaction_id):
+    t = Transaction.query.get_or_404(transaction_id)
+    db.session.delete(t)
+    db.session.commit()
+    return redirect(url_for("transactions.index"))
