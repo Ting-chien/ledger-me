@@ -1,96 +1,43 @@
 {% extends "base.html" %}
 
-{% block page_content %}
+{% block page_content %}    
+
 <div class="d-flex justify-content-between align-items-center mb-3 mt-3">
     <h1 class="mb-0">Transactions</h1>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-        data-bs-target="#createTransactionModal">新增交易</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTransactionModal">新增交易</button>
 </div>
+
+{% from 'transactions/transaction_modal.html' import transaction_modal %}
 
 <!-- Create Transaction Modal -->
-<div class="modal fade" id="createTransactionModal" tabindex="-1" aria-labelledby="createTransactionModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('transactions.index') }}" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createTransactionModalLabel">新增交易</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="item" class="form-label">Item</label>
-                        <input type="text" class="form-control" id="item" name="item" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <select class="form-select" id="category" name="category">
-                            <option value="">請選擇</option>
-                            {% for c in categories %}
-                            <option value="{{ c.id }}">{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="expense" class="form-label">Expense</label>
-                        <input type="number" class="form-control" id="expense" name="expense" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="date" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="date" name="date">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">送出</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{{ transaction_modal(
+    modal_id='createTransactionModal',
+    modal_title='新增交易',
+    form_action=url_for('transactions.index'),
+    form_method='post',
+    submit_text='送出',
+    item='',
+    category_id='',
+    expense='',
+    date='',
+    categories=categories,
+    is_edit=False
+) }}
 
 <!-- Edit Transaction Modal -->
-<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="editTransactionForm" action="#" method="post">
-                <input type="hidden" name="_method" value="PUT">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editTransactionModalLabel">編輯交易</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="edit-id" name="id">
-                    <div class="mb-3">
-                        <label for="edit-item" class="form-label">Item</label>
-                        <input type="text" class="form-control" id="edit-item" name="item" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-category" class="form-label">Category</label>
-                        <select class="form-select" id="edit-category" name="category">
-                            <option value="">請選擇</option>
-                            {% for c in categories %}
-                            <option value="{{ c.id }}">{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-expense" class="form-label">Expense</label>
-                        <input type="number" class="form-control" id="edit-expense" name="expense" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-date" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="edit-date" name="date">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">儲存</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{{ transaction_modal(
+    modal_id='editTransactionModal',
+    modal_title='編輯交易',
+    form_action='#',
+    form_method='post',
+    submit_text='儲存',
+    item='',
+    category_id='',
+    expense='',
+    date='',
+    categories=categories,
+    is_edit=True
+) }}
 
 <!-- Delete Transaction Modal -->
 <div class="modal fade" id="deleteTransactionModal" tabindex="-1" aria-labelledby="deleteTransactionModalLabel" aria-hidden="true">

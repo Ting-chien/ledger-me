@@ -1,0 +1,76 @@
+{#
+  通用交易 modal macro
+  用法：
+  {% from 'transactions/transaction_modal.html' import transaction_modal %}
+  {{ transaction_modal(
+      modal_id='createTransactionModal',
+      modal_title='新增交易',
+      form_action=url_for('transactions.index'),
+      form_method='post',
+      submit_text='送出',
+      item='',
+      category_id='',
+      expense='',
+      date='',
+      categories=categories,
+      is_edit=False
+  ) }}
+
+  {{ transaction_modal(
+      modal_id='editTransactionModal',
+      modal_title='編輯交易',
+      form_action='#',
+      form_method='post',
+      submit_text='儲存',
+      item='',
+      category_id='',
+      expense='',
+      date='',
+      categories=categories,
+      is_edit=True
+  ) }}
+#}
+
+{% macro transaction_modal(modal_id, modal_title, form_action, form_method, submit_text, item, category_id, expense, date, categories, is_edit) %}
+<div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="{{ 'editTransactionForm' if is_edit else '' }}" action="{{ form_action }}" method="{{ form_method }}">
+                {% if is_edit %}<input type="hidden" name="_method" value="PUT">{% endif %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="{{ modal_id }}Label">{{ modal_title }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if is_edit %}<input type="hidden" id="edit-id" name="id">{% endif %}
+                    <div class="mb-3">
+                        <label for="{{ 'edit-item' if is_edit else 'item' }}" class="form-label">Item</label>
+                        <input type="text" class="form-control" id="{{ 'edit-item' if is_edit else 'item' }}" name="item" value="{{ item }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ 'edit-category' if is_edit else 'category' }}" class="form-label">Category</label>
+                        <select class="form-select" id="{{ 'edit-category' if is_edit else 'category' }}" name="category">
+                            <option value="">請選擇</option>
+                            {% for c in categories %}
+                            <option value="{{ c.id }}" {% if c.id|string == category_id|string %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ 'edit-expense' if is_edit else 'expense' }}" class="form-label">Expense</label>
+                        <input type="number" class="form-control" id="{{ 'edit-expense' if is_edit else 'expense' }}" name="expense" value="{{ expense }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ 'edit-date' if is_edit else 'date' }}" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="{{ 'edit-date' if is_edit else 'date' }}" name="date" value="{{ date }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endmacro %}
