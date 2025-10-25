@@ -1,0 +1,42 @@
+<div class="card h-100">
+    <div class="card-header bg-white border-0 ps-3 pe-3 pt-3 pb-0">
+        <h4 class="card-title fw-bold text-start m-0" style="font-size: 1rem;">Expenses Trend</h4>
+    </div>
+	<div class="card-body">
+		<canvas id="expenseLineChart" height="100"></canvas>
+	</div>
+</div>
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+	fetch("/reports/expenses-trend")
+		.then(resp => resp.json())
+		.then(data => {
+			const ctx = document.getElementById('expenseLineChart').getContext('2d');
+			new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: data.labels,
+					datasets: [{
+						label: '累積支出',
+						data: data.data,
+						borderColor: 'rgba(75, 192, 192, 1)',
+						backgroundColor: 'rgba(75, 192, 192, 0.2)',
+						fill: true,
+						tension: 0.2
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: { display: true }
+					},
+					scales: {
+						x: { title: { display: true, text: '日期' } },
+						y: { title: { display: true, text: '累積支出' }, beginAtZero: true }
+					}
+				}
+			});
+		});
+</script>
+{% endblock %}

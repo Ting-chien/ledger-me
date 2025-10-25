@@ -1,0 +1,20 @@
+<div id="total-expenses-card" class="card h-100 d-flex flex-column" style="aspect-ratio: 1 / 1; min-width: 180px;">
+  <div class="card-header bg-white border-0 ps-3 pe-3 pt-3 pb-0">
+    <h4 class="card-title fw-bold text-start m-0" style="font-size: 1rem;">Total Expense</h4>
+  </div>
+  <div class="card-body text-center d-flex flex-column justify-content-center align-items-center h-100">
+    <div id="total-expenses-value" class="fw-bold" style="font-size: 3.5rem;">--</div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/reports/total-expenses')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('total-expenses-value').textContent = '$' + (data.total_expenses ?? 0).toLocaleString();
+    })
+    .catch(() => {
+      document.getElementById('total-expenses-value').textContent = '--';
+    });
+});
+</script>

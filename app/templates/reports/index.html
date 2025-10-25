@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h1 class="mt-3 mb-3">Reports &amp; Analytics</h1>
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-4">
+            {% include "reports/total_expenses.html" %}
+        </div>
+        <div class="col-md-4">
+            {% include "reports/expenses_breakdown.html" %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            {% include "reports/expenses_trend.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}
