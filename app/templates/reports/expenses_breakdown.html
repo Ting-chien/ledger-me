@@ -1,48 +1,49 @@
-<div id="expenses-breakdown-card" class="card h-100 d-flex flex-column flex-grow-1" style="aspect-ratio: 1 / 1; min-width: 240px;">
-  <div class="card-header bg-white border-0 ps-3 pe-3 pt-3 pb-0">
-    <h4 class="card-title fw-bold text-start m-0" style="font-size: 1rem;">Expenses Breakdown</h4>
-  </div>
-  <div class="card-body d-flex flex-column justify-content-center align-items-center h-100">
-    <canvas id="expensesBreakdownChart" style="width:100%;height:100%;max-width:180px;max-height:180px;"></canvas>
-  </div>
+<div id="expenses-breakdown-card" class="card h-100 d-flex flex-column flex-grow-1"
+    style="aspect-ratio: 1 / 1; min-width: 240px;">
+    <div class="card-header bg-white border-0 ps-3 pe-3 pt-3 pb-0">
+        <h4 class="card-title fw-bold text-start m-0" style="font-size: 1rem;">Expenses Breakdown</h4>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center align-items-center h-100">
+        <canvas id="expensesBreakdownChart" style="width:100%;height:100%;max-width:180px;max-height:180px;"></canvas>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-let breakdownChartInstance = null;
-window.fetchAndRenderBreakdown = function(range = 'month') {
-  fetch(`/reports/expenses-breakdown?range=${range}`)
-    .then(response => response.json())
-    .then(data => {
-      const ctx = document.getElementById('expensesBreakdownChart').getContext('2d');
-      if (breakdownChartInstance) breakdownChartInstance.destroy();
-      breakdownChartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: data.labels,
-          datasets: [{
-            data: data.data,
-            backgroundColor: [
-              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'
-            ],
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { 
-                display: true, 
-                position: 'bottom',
-                labels: {
-                    boxWidth: 12,
-                    padding: 10,
-                    font: { size: 12 }
-                },
-                maxWidth: 300
-            }
-          }
-        }
-      });
-    });
-};
+    let breakdownChartInstance = null;
+    window.fetchAndRenderBreakdown = function (range = 'month') {
+        fetch(`/reports/expenses-breakdown?range=${range}`)
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('expensesBreakdownChart').getContext('2d');
+                if (breakdownChartInstance) breakdownChartInstance.destroy();
+                breakdownChartInstance = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            data: data.data,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'
+                            ],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 10,
+                                    font: { size: 12 }
+                                },
+                                maxWidth: 300
+                            }
+                        }
+                    }
+                });
+            });
+    };
 </script>
 </script>

@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block page_content %}
+
+<!-- Title and Chart Range -->
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
     <h1 class="m-0">Reports &amp; Analytics</h1>
     <div class="btn-group" role="group" aria-label="Chart Range">
@@ -8,6 +10,8 @@
         <button type="button" class="btn btn-outline-primary" id="btn-week">Week</button>
     </div>
 </div>
+
+<!-- Report Widgets -->
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-4">
@@ -23,6 +27,7 @@
         </div>
     </div>
 </div>
+
 <script>
 let currentRange = 'month';
 function updateAllWidgets() {
@@ -31,6 +36,7 @@ function updateAllWidgets() {
     window.fetchAndRenderTrend(currentRange);
 }
 document.addEventListener('DOMContentLoaded', function() {
+    // If page content is loaded, render all widgets and add event listeners
     updateAllWidgets();
     document.getElementById('btn-month').addEventListener('click', function() {
         currentRange = 'month';
