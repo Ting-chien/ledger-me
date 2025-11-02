@@ -1,5 +1,7 @@
 import os
+from dotenv import load_dotenv
 
+load_dotenv() # Load environment variables when running by gunicorn
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -22,6 +24,11 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
 
+class ProductionConfig(Config):
+    DEBUG = False
+
+
 config = {
-    'development': DevelopmentConfig
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
 }

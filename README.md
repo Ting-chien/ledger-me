@@ -27,7 +27,8 @@ flask run
 
 ## Database Migration
 
-Remember to import your models in `migrations/env.py` to enable Alembic to detect model changes.
+1. Remember to import your models in `migrations/env.py` to enable Alembic to detect model changes.
+2. Run `flask db upgrade` directly when running in a new environment.
 
 ```bash
 # Step 1. Initialize migration environment (only once)
