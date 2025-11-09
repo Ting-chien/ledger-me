@@ -8,6 +8,57 @@
         data-bs-target="#createTransactionModal">新增交易</button>
 </div>
 
+<!-- 篩選器 -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+        <h6 class="card-title mb-0">
+            <i class="bi bi-funnel me-2"></i>篩選條件
+        </h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('transactions.index') }}">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="search" class="form-label fw-semibold">
+                        <i class="bi bi-search me-1"></i>文字篩選
+                    </label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           placeholder="搜尋項目名稱..." value="{{ search_text }}">
+                </div>
+                <div class="col-md-3">
+                    <label for="category" class="form-label fw-semibold">
+                        <i class="bi bi-tags me-1"></i>分類
+                    </label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">全部分類</option>
+                        {% for c in categories %}
+                        <option value="{{ c.id }}" {% if c.id|string == category_filter|string %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="date" class="form-label fw-semibold">
+                        <i class="bi bi-calendar me-1"></i>日期
+                    </label>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
+                </div>
+                <div class="col-md-3">
+                    <div class="d-grid gap-2 d-md-flex">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-search me-1"></i>查詢
+                        </button>
+                        <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary flex-fill">
+                            <i class="bi bi-arrow-clockwise me-1"></i>清除
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 {% from 'transactions/transaction_modal.html' import transaction_modal %}
 
 <!-- Create Transaction Modal -->
@@ -65,49 +116,85 @@ is_edit=True
     </div>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Item</th>
-            <th>Category</th>
-            <th>Expense</th>
-            <th>Remark</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<!-- 交易清單 -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white border-bottom">
+        <h6 class="card-title mb-0">
+            <i class="bi bi-list-ul me-2"></i>交易清單
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="fw-semibold">Date</th>
+                        <th class="fw-semibold">Item</th>
+                        <th class="fw-semibold">Category</th>
+                        <th class="fw-semibold">Expense</th>
+                        <th class="fw-semibold">Remark</th>
+                        <th class="fw-semibold text-center" style="width: 120px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
         {% for t in transactions %}
-        <tr>
-            <td>{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}</td>
-            <td>{{ t.item }}</td>
-            <td>{{ t.category.name if t.category else '' }}</td>
-            <td>{{ t.expense }}</td>
-            <td>{{ t.remark if t.remark else '' }}</td>
-            <td class="text-end">
-                <a href="#" class="btn btn-sm edit-btn" title="編輯" data-bs-toggle="modal"
-                    data-bs-target="#editTransactionModal" data-id="{{ t.id }}" data-item="{{ t.item }}"
-                    data-category="{{ t.category_id }}" data-expense="{{ t.expense }}"
-                    data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}">
-                    <img src="/static/img/update.png" alt="Edit" width="18" height="18">
-                </a>
-                <a href="#" class="btn btn-sm delete-btn" title="刪除" data-bs-toggle="modal"
-                    data-bs-target="#deleteTransactionModal" data-id="{{ t.id }}">
-                    <img src="/static/img/remove.png" alt="Delete" width="18" height="18">
-                </a>
+        <tr class="align-middle">
+            <td>
+                <span class="text-dark">
+                    {{ t.transaction_at.strftime('%Y/%m/%d') if t.transaction_at else '--' }}
+                </span>
+            </td>
+            <td class="fw-medium">{{ t.item }}</td>
+            <td>
+                {% if t.category %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                        {{ t.category.name }}
+                    </span>
+                {% else %}
+                    <span class="text-muted">--</span>
+                {% endif %}
+            </td>
+            <td class="fw-bold text-danger">${{ "{:,.0f}".format(t.expense) if t.expense else '0' }}</td>
+            <td class="text-muted small">{{ t.remark if t.remark else '--' }}</td>
+            <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm edit-btn" title="編輯" 
+                            data-bs-toggle="modal" data-bs-target="#editTransactionModal" 
+                            data-id="{{ t.id }}" data-item="{{ t.item }}" 
+                            data-category="{{ t.category_id }}" data-expense="{{ t.expense }}"
+                            data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}"
+                            data-remark="{{ t.remark if t.remark else '' }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" title="刪除" 
+                            data-bs-toggle="modal" data-bs-target="#deleteTransactionModal" 
+                            data-id="{{ t.id }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </td>
         </tr>
         {% endfor %}
     </tbody>
-</table>
+            </table>
+        </div>
+    </div>
+</div>
 
 <!-- Pagination -->
-<nav aria-label="Page navigation example">
-    <ul class="pagination">
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <div>
+        <small class="text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            共 {{ total_pages * 5 }} 筆交易，目前第 {{ current_page }} / {{ total_pages }} 頁
+        </small>
+    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm mb-0">
         <!-- Previous Page -->
         {% if current_page > 1 %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=current_page-1) }}" aria-label="Previous">
+            <a class="page-link" href="{{ url_for('transactions.index', page=current_page-1, search=search_text, category=category_filter, date=date_filter) }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -127,14 +214,14 @@ is_edit=True
         </li>
         {% else %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=page_num) }}">{{ page_num }}</a>
+            <a class="page-link" href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{ page_num }}</a>
         </li>
         {% endif %}
         {% endfor %}
 
         <!-- Next Page -->
         {% if current_page < total_pages %} <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=current_page+1) }}" aria-label="Next">
+            <a class="page-link" href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter) }}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>
             </li>
@@ -145,8 +232,9 @@ is_edit=True
                 </span>
             </li>
             {% endif %}
-    </ul>
-</nav>
+        </ul>
+    </nav>
+</div>
 {% endblock %}
 
 {% block scripts %}

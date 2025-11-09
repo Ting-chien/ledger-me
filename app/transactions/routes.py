@@ -26,10 +26,30 @@ def index():
         db.session.commit()
         return redirect(url_for("transactions.index"))
 
+    # 篩選參數
+    search_text = request.args.get('search', '')
+    category_filter = request.args.get('category', '')
+    date_filter = request.args.get('date', '')
+
+    # 基礎查詢
+    query = Transaction.query
+
+    # 文字篩選 (item 欄位)
+    if search_text:
+        query = query.filter(Transaction.item.contains(search_text))
+
+    # 分類篩選
+    if category_filter:
+        query = query.filter(Transaction.category_id == category_filter)
+
+    # 日期篩選
+    if date_filter:
+        query = query.filter(Transaction.transaction_at == date_filter)
+
     # Pagination
     page = request.args.get('page', 1, type=int)
     page_size = 5
-    pagination = Transaction.query.order_by(Transaction.created_at.desc()).paginate(
+    pagination = query.order_by(Transaction.created_at.desc()).paginate(
         page=page, 
         per_page=page_size, 
         error_out=False
@@ -40,6 +60,9 @@ def index():
         categories=categories,
         total_pages=pagination.pages,
         current_page=pagination.page,
+        search_text=search_text,
+        category_filter=category_filter,
+        date_filter=date_filter,
     )
 
 
