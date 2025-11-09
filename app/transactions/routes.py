@@ -25,8 +25,22 @@ def index():
         db.session.add(new_transaction)
         db.session.commit()
         return redirect(url_for("transactions.index"))
-    transactions = Transaction.query.order_by(Transaction.created_at.desc()).all()
-    return render_template("transactions/index.html", transactions=transactions, categories=categories)
+
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    page_size = 5
+    pagination = Transaction.query.order_by(Transaction.created_at.desc()).paginate(
+        page=page, 
+        per_page=page_size, 
+        error_out=False
+    )
+    return render_template(
+        "transactions/index.html",
+        transactions=pagination.items,
+        categories=categories,
+        total_pages=pagination.pages,
+        current_page=pagination.page,
+    )
 
 
 @blueprint.route("/<int:transaction_id>", methods=["PUT"])
