@@ -12,6 +12,7 @@
       category_id='',
       expense='',
       date='',
+      remark='',
       categories=categories,
       is_edit=False
   ) }}
@@ -26,12 +27,13 @@
       category_id='',
       expense='',
       date='',
+      remark='',
       categories=categories,
       is_edit=True
   ) }}
 #}
 
-{% macro transaction_modal(modal_id, modal_title, form_action, form_method, submit_text, item, category_id, expense, date, categories, is_edit) %}
+{% macro transaction_modal(modal_id, modal_title, form_action, form_method, submit_text, item, category_id, expense, date, remark, categories, is_edit) %}
 <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -64,9 +66,13 @@
                         <label for="{{ 'edit-date' if is_edit else 'date' }}" class="form-label">Date</label>
                         <input type="date" class="form-control" id="{{ 'edit-date' if is_edit else 'date' }}" name="date" value="{{ date }}">
                     </div>
+                    <div class="mb-3">
+                        <label for="{{ 'edit-remark' if is_edit else 'remark' }}" class="form-label">Remark</label>
+                        <input type="text" class="form-control" id="{{ 'edit-remark' if is_edit else 'remark' }}" name="remark" value="{{ remark }}">
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
                 </div>
             </form>

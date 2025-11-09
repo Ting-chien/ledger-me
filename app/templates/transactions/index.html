@@ -15,11 +15,12 @@
     modal_title='新增交易',
     form_action=url_for('transactions.index'),
     form_method='post',
-    submit_text='送出',
+    submit_text='Submit',
     item='',
     category_id='',
     expense='',
     date='',
+    remark='',
     categories=categories,
     is_edit=False
 ) }}
@@ -30,11 +31,12 @@
     modal_title='編輯交易',
     form_action='#',
     form_method='post',
-    submit_text='儲存',
+    submit_text='Submit',
     item='',
     category_id='',
     expense='',
     date='',
+    remark='',
     categories=categories,
     is_edit=True
 ) }}
@@ -64,20 +66,22 @@
 <table class="table table-striped">
     <thead>
         <tr>
+            <th>Date</th>
             <th>Item</th>
             <th>Category</th>
             <th>Expense</th>
-            <th>Date</th>
+            <th>Remark</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         {% for t in transactions %}
         <tr>
+            <td>{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}</td>
             <td>{{ t.item }}</td>
             <td>{{ t.category.name if t.category else '' }}</td>
             <td>{{ t.expense }}</td>
-            <td>{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}</td>
+            <td>{{ t.remark if t.remark else '' }}</td>
             <td class="text-end">
                 <a href="#" class="btn btn-sm edit-btn" title="編輯"
                    data-bs-toggle="modal" data-bs-target="#editTransactionModal"
@@ -115,6 +119,7 @@
                 document.getElementById('edit-category').value = btn.getAttribute('data-category');
                 document.getElementById('edit-expense').value = btn.getAttribute('data-expense');
                 document.getElementById('edit-date').value = btn.getAttribute('data-date');
+                document.getElementById('edit-remark').value = btn.getAttribute('data-remark');
                 editForm.action = '/transactions/' + btn.getAttribute('data-id');
             });
         });

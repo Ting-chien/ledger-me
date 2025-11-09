@@ -14,11 +14,13 @@ def index():
         category_id = request.form.get("category")
         expense = request.form.get("expense")
         transaction_at = request.form.get("date")
+        remark = request.form.get("remark")
         new_transaction = Transaction(
             item=item,
             category_id=category_id if category_id else None,
             expense=expense,
-            transaction_at=transaction_at
+            transaction_at=transaction_at,
+            remark=remark
         )
         db.session.add(new_transaction)
         db.session.commit()
@@ -34,10 +36,12 @@ def update(transaction_id):
     category_id = request.form.get("category")
     expense = request.form.get("expense")
     transaction_at = request.form.get("date")
+    remark = request.form.get("remark")
     t.item = item
     t.category_id = category_id if category_id else None
     t.expense = expense
     t.transaction_at = transaction_at
+    t.remark = remark
     db.session.commit()
     return redirect(url_for("transactions.index"))
 

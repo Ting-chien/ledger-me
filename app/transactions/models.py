@@ -14,6 +14,7 @@ class Transaction(db.Model):
 	transaction_at = db.Column(db.DateTime, nullable=False)
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+	remark = db.Column(db.Text, nullable=True)
 
 	category = db.relationship('TransactionCategory', backref='transactions', passive_deletes=True)
 
