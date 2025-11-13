@@ -2,54 +2,50 @@
 
 {% block page_content %}
 
-<!-- Title and Chart Range -->
+<!-- Title -->
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
     <h1 class="m-0">Reports &amp; Analytics</h1>
-    <div class="btn-group" role="group" aria-label="Chart Range">
-        <button type="button" class="btn btn-outline-primary active" id="btn-month">Month</button>
-        <button type="button" class="btn btn-outline-primary" id="btn-week">Week</button>
-    </div>
 </div>
 
 <!-- Report Widgets -->
-<div class="container mt-4">
+<div class="container mt-4 mb-4">
     <div class="row mb-4">
         <div class="col-md-4">
             {% include "reports/total_expenses.html" %}
         </div>
         <div class="col-md-4">
-            {% include "reports/expenses_breakdown.html" %}
+            <div class="card h-100 d-flex flex-column" style="aspect-ratio: 1.5 / 1;">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                    <i class="bi bi-graph-up text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3 mb-0">Coming Soon</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 d-flex flex-column" style="aspect-ratio: 1.5 / 1;">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                    <i class="bi bi-pie-chart text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3 mb-0">Coming Soon</p>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-12">
+        <div class="col-md-4">
+            {% include "reports/expenses_breakdown.html" %}
+        </div>
+        <div class="col-md-8">
             {% include "reports/expenses_trend.html" %}
         </div>
     </div>
 </div>
 
 <script>
-let currentRange = 'month';
-function updateAllWidgets() {
-    window.fetchAndRenderTotalExpense(currentRange);
-    window.fetchAndRenderBreakdown(currentRange);
-    window.fetchAndRenderTrend(currentRange);
-}
 document.addEventListener('DOMContentLoaded', function() {
-    // If page content is loaded, render all widgets and add event listeners
-    updateAllWidgets();
-    document.getElementById('btn-month').addEventListener('click', function() {
-        currentRange = 'month';
-        this.classList.add('active');
-        document.getElementById('btn-week').classList.remove('active');
-        updateAllWidgets();
-    });
-    document.getElementById('btn-week').addEventListener('click', function() {
-        currentRange = 'week';
-        this.classList.add('active');
-        document.getElementById('btn-month').classList.remove('active');
-        updateAllWidgets();
-    });
+    // 總是以月為單位載入所有 widgets
+    window.fetchAndRenderTotalExpense('month');
+    window.fetchAndRenderBreakdown('month');
+    window.fetchAndRenderTrend('month');
 });
 </script>
 {% endblock %}

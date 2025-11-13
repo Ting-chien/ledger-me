@@ -5,7 +5,7 @@
         </h4>
     </div>
     <div class="card-body">
-        <canvas id="expenseLineChart" height="100"></canvas>
+        <canvas id="expenseBarChart"></canvas>
     </div>
 </div>
 {% block scripts %}
@@ -17,33 +17,34 @@
             .then((resp) => resp.json())
             .then((data) => {
                 const ctx = document
-                    .getElementById("expenseLineChart")
+                    .getElementById("expenseBarChart")
                     .getContext("2d");
                 if (chartInstance) chartInstance.destroy();
                 chartInstance = new Chart(ctx, {
-                    type: "line",
+                    type: "bar",
                     data: {
                         labels: data.labels,
                         datasets: [
                             {
-                                label: "累積支出",
+                                label: "每日支出",
                                 data: data.data,
+                                backgroundColor: "rgba(75, 192, 192, 0.6)",
                                 borderColor: "rgba(75, 192, 192, 1)",
-                                backgroundColor: "rgba(75, 192, 192, 0.2)",
-                                fill: true,
-                                tension: 0.2,
+                                borderWidth: 1,
                             },
                         ],
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2.5,
                         plugins: {
-                            legend: { display: true },
+                            legend: { display: false }, // 隱藏 label 提示
                         },
                         scales: {
                             x: { title: { display: true, text: "日期" } },
                             y: {
-                                title: { display: true, text: "累積支出" },
+                                title: { display: true, text: "支出金額" },
                                 beginAtZero: true,
                             },
                         },
