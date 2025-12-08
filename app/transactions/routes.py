@@ -49,7 +49,7 @@ def index():
     # Pagination
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', 10, type=int)
-    pagination = query.order_by(Transaction.created_at.desc()).paginate(
+    pagination = query.order_by(Transaction.transaction_at.desc()).paginate(
         page=page, 
         per_page=page_size, 
         error_out=False
