@@ -2,6 +2,11 @@
 
 LedgerMe is a Web App to track my income/expense, investment and any financial activities 😎
 
+Current module includes:
+- Home Page: No content yet
+- Transaction Page: Add, edit, delete, view transactions
+- Report Page: See expenses breakdown by categories and days in a month
+
 ## Quick Start
 
 ### Prerequisites
@@ -25,7 +30,7 @@ Please ask information to the project owner.
 flask run
 ```
 
-## Database Migration
+### Database Migration
 
 1. Remember to import your models in `migrations/env.py` to enable Alembic to detect model changes.
 2. Run `flask db upgrade` directly when running in a new environment.
@@ -40,3 +45,11 @@ flask db migrate -m "Add your migration message here"
 # Step 3. Apply the migration to the database
 flask db upgrade
 ```
+
+## History
+
+Table of changes made to the project.
+
+| Date | Version | Description                      |
+| ---- | ------- | -------------------------------- |
+| -    | 1.2.2   | * Add history table in README.md |
