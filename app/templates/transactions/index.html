@@ -182,7 +182,7 @@ is_edit=True
 </div>
 
 <!-- Pagination -->
-<div class="d-flex justify-content-between align-items-center mt-4">
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
     <div>
         <small class="text-muted">
             <i class="bi bi-info-circle me-1"></i>
@@ -206,32 +206,58 @@ is_edit=True
         </li>
         {% endif %}
 
-        <!-- Page Numbers -->
-        {% for page_num in range(1, total_pages + 1) %}
-        {% if page_num == current_page %}
-        <li class="page-item active">
-            <span class="page-link">{{ page_num }}</span>
-        </li>
-        {% else %}
+        <!-- Condensed Page Numbers -->
+        {% set page_window = 2 %}
+        {% set start_page = current_page - page_window if current_page - page_window > 1 else 1 %}
+        {% set end_page = current_page + page_window if current_page + page_window < total_pages else total_pages %}
+
+        {# Always show first page #}
+        {% if start_page > 1 %}
         <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{ page_num }}</a>
+            <a class="page-link" href="{{ url_for('transactions.index', page=1, search=search_text, category=category_filter, date=date_filter) }}">1</a>
         </li>
+        {% if start_page > 2 %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
         {% endif %}
+        {% endif %}
+
+        {# Main window #}
+        {% for page_num in range(start_page, end_page + 1) %}
+            {% if page_num == current_page %}
+            <li class="page-item active">
+                <span class="page-link">{{ page_num }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{ page_num }}</a>
+            </li>
+            {% endif %}
         {% endfor %}
 
+        {# Always show last page #}
+        {% if end_page < total_pages %}
+        {% if end_page < total_pages - 1 %}
+        <li class="page-item disabled"><span class="page-link">...</span></li>
+        {% endif %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('transactions.index', page=total_pages, search=search_text, category=category_filter, date=date_filter) }}">{{ total_pages }}</a>
+        </li>
+        {% endif %}
+
         <!-- Next Page -->
-        {% if current_page < total_pages %} <li class="page-item">
+        {% if current_page < total_pages %}
+        <li class="page-item">
             <a class="page-link" href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter) }}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
             </a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <span class="page-link" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </span>
-            </li>
-            {% endif %}
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </span>
+        </li>
+        {% endif %}
         </ul>
     </nav>
 </div>
