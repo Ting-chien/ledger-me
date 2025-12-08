@@ -4,6 +4,9 @@ FROM python:3.11-slim
 # Set work directory
 WORKDIR /app
 
+# 建立 logs 目錄
+RUN mkdir -p /app/logs
+
 # Install Python dependencies
 # 將 dependencies 和 code 分開 COPY，可以利用 Docker 的 layer cache，減少重建映像檔的時間
 COPY requirements.txt ./
@@ -19,4 +22,4 @@ EXPOSE 8000
 ENV FLASK_ENV=production
 
 # Set entrypoint
-CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "run:app", "--bind", "0.0.0.0:8000", "--access-logfile", "logs/access.log", "--error-logfile", "logs/error.log"]
