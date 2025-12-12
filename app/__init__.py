@@ -37,6 +37,17 @@ def configure_database(app):
             )
         return response
     
+    
+def configure_logging(app):
+    
+    if app.debug or app.testing:
+        return
+
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    if gunicorn_logger.handlers:
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+
 
 def attach_sql_listeners(app):
 
@@ -59,6 +70,7 @@ def create_app(config):
     migrate.init_app(app, db)
     register_blueprints(app)
     configure_database(app)
+    configure_logging(app)
 
     with app.app_context():
         attach_sql_listeners(app)
