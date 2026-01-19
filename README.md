@@ -64,12 +64,14 @@ Transaction Page (`/transactions`)
 - [ ] **Daily Grouping**: Group transactions by date (e.g., "Today", "Yesterday") for better readability.
 - [ ] **RESTful API Improvements**: Return JSON/204 for PUT/DELETE actions to handle UI updates via JS instead of page reloads.
 - [ ] **Data Validation**: enhance backend validation for dates and amounts.
+- [ ] Optimize calander UI in transaction modal
 
 ## History
 
 Table of changes made to the project.
 
-| Date | Version | Description |
-| ---- | ------- | ----------- |
-| 2026-01-19 | 1.3.0 | * Enhance Report page (Month Nav, MoM, Projection)<br>* Unify Transaction page UI integration<br>* Add seed data script |
-| -    | 1.2.2   | * Add history table in README.md |
+| Date       | Version | Description                                                                                                                                                         |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-01-19 | 1.2.0   | * Enhance Report page (Month Nav, MoM, Projection)<br>* Unify Transaction page UI integration<br>* Add seed data script                                             |
+| 2025-12-12 | 1.1.0   | * Add partition table for transactions<br>* Update log system in gunicorn<br>* Update sort key in transaction page<br>* Update pagination logic in transaction page |
+| 2025-11-13 | 1.0.2   | * Add history table in README.md                                                                                                                                    |
