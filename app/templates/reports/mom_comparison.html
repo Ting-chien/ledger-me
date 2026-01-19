@@ -1,0 +1,36 @@
+<div id="mom-comparison-card" class="card h-100 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">vs Last Month</h6>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center align-items-center py-4">
+        <div id="mom-diff-percent" class="display-5 fw-bold">--</div>
+        <div id="mom-diff-amount" class="text-muted small mt-2">--</div>
+    </div>
+</div>
+<script>
+    window.fetchAndRenderMoM = function (year, month) {
+        const query = (year && month) ? `?year=${year}&month=${month}` : '';
+        fetch(`/reports/mom-comparison${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const percent = data.diff_percent;
+                const sign = percent > 0 ? '+' : '';
+                // 調整顏色邏輯：花費增加(>0)是紅色(danger)，花費減少(<0)是綠色(success)
+                const colorClass = percent > 0 ? 'text-danger' : (percent < 0 ? 'text-success' : 'text-muted');
+                
+                const percentEl = document.getElementById('mom-diff-percent');
+                percentEl.textContent = `${sign}${percent}%`;
+                // 重置所有可能影響的 class，只保留 display-5 fw-bold 和新的 colorClass
+                percentEl.className = `display-5 fw-bold ${colorClass}`;
+                percentEl.style.fontSize = ''; // 清除 inline style
+
+                const diffAmount = Number(Math.abs(data.diff_amount)).toLocaleString();
+                const moreOrLess = data.diff_amount > 0 ? 'more' : 'less';
+                document.getElementById('mom-diff-amount').innerHTML = `<span class="fw-semibold">$${diffAmount}</span> ${moreOrLess} than last month`;
+            })
+            .catch(() => {
+                document.getElementById('mom-diff-percent').textContent = '--';
+                document.getElementById('mom-diff-amount').textContent = '';
+            });
+    };
+</script>

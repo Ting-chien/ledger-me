@@ -36,44 +36,54 @@
 {% macro transaction_modal(modal_id, modal_title, form_action, form_method, submit_text, item, category_id, expense, date, remark, categories, is_edit) %}
 <div class="modal fade" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_id }}Label" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow">
             <form id="{{ 'editTransactionForm' if is_edit else '' }}" action="{{ form_action }}" method="{{ form_method }}">
                 {% if is_edit %}<input type="hidden" name="_method" value="PUT">{% endif %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="{{ modal_id }}Label">{{ modal_title }}</h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="{{ modal_id }}Label">{{ modal_title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pt-4">
                     {% if is_edit %}<input type="hidden" id="edit-id" name="id">{% endif %}
+                    
                     <div class="mb-3">
-                        <label for="{{ 'edit-item' if is_edit else 'item' }}" class="form-label">Item</label>
-                        <input type="text" class="form-control" id="{{ 'edit-item' if is_edit else 'item' }}" name="item" value="{{ item }}" required>
+                        <label for="{{ 'edit-item' if is_edit else 'item' }}" class="form-label small text-muted fw-bold">ITEM</label>
+                        <input type="text" class="form-control" id="{{ 'edit-item' if is_edit else 'item' }}" name="item" value="{{ item }}" placeholder="e.g. Lunch" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="{{ 'edit-category' if is_edit else 'category' }}" class="form-label">Category</label>
-                        <select class="form-select" id="{{ 'edit-category' if is_edit else 'category' }}" name="category">
-                            <option value="">請選擇</option>
-                            {% for c in categories %}
-                            <option value="{{ c.id }}" {% if c.id|string == category_id|string %}selected{% endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ 'edit-category' if is_edit else 'category' }}" class="form-label small text-muted fw-bold">CATEGORY</label>
+                            <select class="form-select" id="{{ 'edit-category' if is_edit else 'category' }}" name="category">
+                                <option value="">Select Category</option>
+                                {% for c in categories %}
+                                <option value="{{ c.id }}" {% if c.id|string == category_id|string %}selected{% endif %}>{{ c.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ 'edit-expense' if is_edit else 'expense' }}" class="form-label small text-muted fw-bold">EXPENSE</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted border-end-0">$</span>
+                                <input type="number" class="form-control border-start-0 ps-0" id="{{ 'edit-expense' if is_edit else 'expense' }}" name="expense" value="{{ expense }}" placeholder="0" required>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="mb-3">
-                        <label for="{{ 'edit-expense' if is_edit else 'expense' }}" class="form-label">Expense</label>
-                        <input type="number" class="form-control" id="{{ 'edit-expense' if is_edit else 'expense' }}" name="expense" value="{{ expense }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ 'edit-date' if is_edit else 'date' }}" class="form-label">Date</label>
+                        <label for="{{ 'edit-date' if is_edit else 'date' }}" class="form-label small text-muted fw-bold">DATE</label>
                         <input type="date" class="form-control" id="{{ 'edit-date' if is_edit else 'date' }}" name="date" value="{{ date }}">
                     </div>
+
                     <div class="mb-3">
-                        <label for="{{ 'edit-remark' if is_edit else 'remark' }}" class="form-label">Remark</label>
-                        <input type="text" class="form-control" id="{{ 'edit-remark' if is_edit else 'remark' }}" name="remark" value="{{ remark }}">
+                        <label for="{{ 'edit-remark' if is_edit else 'remark' }}" class="form-label small text-muted fw-bold">REMARK</label>
+                        <textarea class="form-control" id="{{ 'edit-remark' if is_edit else 'remark' }}" name="remark" rows="2" placeholder="Optional notes...">{{ remark }}</textarea>
                     </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">{{ submit_text }}</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4">{{ submit_text }}</button>
                 </div>
             </form>
         </div>

@@ -1,0 +1,30 @@
+<div id="month-projection-card" class="card h-100 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">Month Projection</h6>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center align-items-center py-4">
+        <div id="month-projection-value" class="display-5 fw-bold text-dark">--</div>
+        <div id="month-projection-desc" class="text-muted small mt-2">--</div>
+    </div>
+</div>
+<script>
+    window.fetchAndRenderProjection = function (year, month) {
+        const query = (year && month) ? `?year=${year}&month=${month}` : '';
+        fetch(`/reports/month-projection${query}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('month-projection-value').textContent = '$' + Number(data.projection ?? 0).toLocaleString();
+                if (data.is_current_month) {
+                    document.getElementById('month-projection-desc').textContent = `${data.days_remaining} days remaining`;
+                    document.getElementById('month-projection-value').classList.remove('text-muted');
+                } else {
+                    document.getElementById('month-projection-desc').textContent = 'Actual Final';
+                    document.getElementById('month-projection-value').classList.add('text-muted');
+                }
+            })
+            .catch(() => {
+                document.getElementById('month-projection-value').textContent = '--';
+                document.getElementById('month-projection-desc').textContent = '';
+            });
+    };
+</script>

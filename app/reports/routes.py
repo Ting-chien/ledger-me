@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from sqlalchemy import func
 from datetime import date, timedelta
+import calendar
 
 from . import blueprint
 from app.transactions.models import Transaction, TransactionCategory
@@ -11,88 +12,197 @@ def index():
     return render_template('reports/index.html')
 
 
-def get_current_month_range():
-	"""取得當月的起始和結束日期"""
-	today = date.today()
-	start = today.replace(day=1)
-	if today.month == 12:
-		next_month = today.replace(year=today.year+1, month=1, day=1)
-	else:
-		next_month = today.replace(month=today.month+1, day=1)
-	end = next_month - timedelta(days=1)
-	return start, end
+def get_month_range(year=None, month=None):
+    """取得指定月份的起始和結束日期，若無指定則為當月"""
+    try:
+        if year and month:
+            year = int(year)
+            month = int(month)
+        else:
+            today = date.today()
+            year = today.year
+            month = today.month
+    except (ValueError, TypeError):
+        today = date.today()
+        year = today.year
+        month = today.month
+
+    # 該月第一天
+    start = date(year, month, 1)
+    # 該月最後一天
+    _, last_day = calendar.monthrange(year, month)
+    end = date(year, month, last_day)
+    return start, end
 
 
-# API endpoint for total expenses
 @blueprint.route('/total-expenses')
 def get_total_expenses():
-	start, end = get_current_month_range()
-	total = (
-		Transaction.query
-		.filter(
-			func.date(Transaction.transaction_at) >= start,
-			func.date(Transaction.transaction_at) <= end
-		)
-		.with_entities(func.sum(Transaction.expense))
-		.scalar() or 0
-	)
-	return jsonify({"total_expenses": int(total)})
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+
+    total = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    return jsonify({"total_expenses": int(total)})
 
 
-# API endpoint for expenses breakdown by category
+@blueprint.route('/month-projection')
+def get_month_projection():
+    year_arg = request.args.get('year')
+    month_arg = request.args.get('month')
+    start, end = get_month_range(year_arg, month_arg)
+    
+    # 計算該月目前累積
+    current_total = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    current_total = int(current_total)
+
+    today = date.today()
+    # 只有當查詢的是「正在進行中的月份」才做預估
+    if start.year == today.year and start.month == today.month:
+        days_passed = today.day
+        total_days = end.day
+        if days_passed > 0:
+            projection = (current_total / days_passed) * total_days
+        else:
+            projection = current_total
+        return jsonify({
+            "projection": int(projection),
+            "is_current_month": True,
+            "days_remaining": total_days - days_passed
+        })
+    else:
+        # 過去或未來的月份，預估值就等於實際值
+        return jsonify({
+            "projection": current_total,
+            "is_current_month": False,
+            "days_remaining": 0
+        })
+
+
+@blueprint.route('/mom-comparison')
+def get_mom_comparison():
+    year_arg = request.args.get('year')
+    month_arg = request.args.get('month')
+    
+    # 當月範圍
+    start, end = get_month_range(year_arg, month_arg)
+    
+    # 上個月範圍
+    # 計算上個月的第一天
+    prev_month_date = start - timedelta(days=1)
+    prev_start, prev_end = get_month_range(prev_month_date.year, prev_month_date.month)
+
+    # 查詢當月總額
+    current_total = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    
+    # 查詢上月總額
+    prev_total = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= prev_start,
+            func.date(Transaction.transaction_at) <= prev_end
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+
+    current_total = int(current_total)
+    prev_total = int(prev_total)
+    
+    diff_amount = current_total - prev_total
+    if prev_total > 0:
+        diff_percent = (diff_amount / prev_total) * 100
+    else:
+        diff_percent = 100 if current_total > 0 else 0
+        
+    return jsonify({
+        "current_total": current_total,
+        "prev_total": prev_total,
+        "diff_amount": diff_amount,
+        "diff_percent": round(diff_percent, 1)
+    })
+
+
 @blueprint.route('/expenses-breakdown')
 def get_expenses_breakdown():
-	start, end = get_current_month_range()
-	results = (
-		Transaction.query
-		.filter(
-			func.date(Transaction.transaction_at) >= start,
-			func.date(Transaction.transaction_at) <= end
-		)
-		.join(TransactionCategory, Transaction.category_id == TransactionCategory.id)
-		.with_entities(TransactionCategory.name, func.sum(Transaction.expense))
-		.group_by(TransactionCategory.name)
-		.all()
-	)
-	labels = [name for name, _ in results]
-	data = [int(total) for _, total in results]
-	return jsonify({"labels": labels, "data": data})
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+
+    results = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end
+        )
+        .join(TransactionCategory, Transaction.category_id == TransactionCategory.id)
+        .with_entities(TransactionCategory.name, func.sum(Transaction.expense))
+        .group_by(TransactionCategory.name)
+        .all()
+    )
+    labels = [name for name, _ in results]
+    data = [int(total) for _, total in results]
+    return jsonify({"labels": labels, "data": data})
 
 
-# API endpoint for expenses trend
 @blueprint.route('/expenses-trend')
 def get_expenses_trend():
-	start, end = get_current_month_range()
-	
-	# 查詢當月所有有交易的日期和金額
-	results = (
-		Transaction.query
-		.filter(
-			func.date(Transaction.transaction_at) >= start,
-			func.date(Transaction.transaction_at) <= end
-		)
-		.with_entities(
-			func.date(Transaction.transaction_at).label('date'),
-			func.sum(Transaction.expense).label('total_expense')
-		)
-		.group_by(func.date(Transaction.transaction_at))
-		.order_by(func.date(Transaction.transaction_at))
-		.all()
-	)
-	
-	# 建立當月所有日期的字典，預設值為 0
-	expenses_dict = {}
-	current_date = start
-	while current_date <= end:
-		expenses_dict[current_date] = 0
-		current_date += timedelta(days=1)
-	
-	# 填入實際有交易的日期金額
-	for r in results:
-		expenses_dict[r.date] = int(r.total_expense)
-	
-	# 轉換為 labels 和 data
-	chart_labels = [d.strftime('%m/%d') for d in sorted(expenses_dict.keys())]
-	chart_data = [expenses_dict[d] for d in sorted(expenses_dict.keys())]
-	
-	return jsonify({"labels": chart_labels, "data": chart_data})
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+    
+    # 查詢當月所有有交易的日期和金額
+    results = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end
+        )
+        .with_entities(
+            func.date(Transaction.transaction_at).label('date'),
+            func.sum(Transaction.expense).label('total_expense')
+        )
+        .group_by(func.date(Transaction.transaction_at))
+        .order_by(func.date(Transaction.transaction_at))
+        .all()
+    )
+    
+    # 建立當月所有日期的字典，預設值為 0
+    expenses_dict = {}
+    current_date = start
+    while current_date <= end:
+        expenses_dict[current_date] = 0
+        current_date += timedelta(days=1)
+    
+    # 填入實際有交易的日期金額
+    for r in results:
+        expenses_dict[r.date] = int(r.total_expense)
+    
+    # 轉換為 labels 和 data
+    chart_labels = [d.strftime('%m/%d') for d in sorted(expenses_dict.keys())]
+    chart_data = [expenses_dict[d] for d in sorted(expenses_dict.keys())]
+    
+    return jsonify({"labels": chart_labels, "data": chart_data})

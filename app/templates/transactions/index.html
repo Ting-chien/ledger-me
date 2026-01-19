@@ -2,35 +2,37 @@
 
 {% block page_content %}
 
-<div class="d-flex justify-content-between align-items-center mb-3 mt-3">
-    <h1 class="mb-0">Transactions</h1>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-        data-bs-target="#createTransactionModal">新增交易</button>
+<!-- Title -->
+<div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+    <h1 class="m-0">Transactions</h1>
+    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal"
+        data-bs-target="#createTransactionModal">
+        <i class="bi bi-plus-lg me-1"></i>New Transaction
+    </button>
 </div>
 
-<!-- 篩選器 -->
-<div class="card mb-4 shadow-sm">
-    <div class="card-header bg-light">
-        <h6 class="card-title mb-0">
-            <i class="bi bi-funnel me-2"></i>篩選條件
+<!-- Filter -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+            <i class="bi bi-funnel me-1"></i>Filter
         </h6>
     </div>
     <div class="card-body">
         <form method="GET" action="{{ url_for('transactions.index') }}">
             <div class="row g-3 align-items-end">
                 <div class="col-md-3">
-                    <label for="search" class="form-label fw-semibold">
-                        <i class="bi bi-search me-1"></i>文字篩選
-                    </label>
-                    <input type="text" class="form-control" id="search" name="search" 
-                           placeholder="搜尋項目名稱..." value="{{ search_text }}">
+                    <label for="search" class="form-label small text-muted fw-bold">SEARCH</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="search" name="search" 
+                           placeholder="Item name..." value="{{ search_text }}">
+                    </div>
                 </div>
                 <div class="col-md-3">
-                    <label for="category" class="form-label fw-semibold">
-                        <i class="bi bi-tags me-1"></i>分類
-                    </label>
+                    <label for="category" class="form-label small text-muted fw-bold">CATEGORY</label>
                     <select class="form-select" id="category" name="category">
-                        <option value="">全部分類</option>
+                        <option value="">All Categories</option>
                         {% for c in categories %}
                         <option value="{{ c.id }}" {% if c.id|string == category_filter|string %}selected{% endif %}>
                             {{ c.name }}
@@ -39,18 +41,16 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="date" class="form-label fw-semibold">
-                        <i class="bi bi-calendar me-1"></i>日期
-                    </label>
+                    <label for="date" class="form-label small text-muted fw-bold">DATE</label>
                     <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
                 </div>
                 <div class="col-md-3">
-                    <div class="d-grid gap-2 d-md-flex">
-                        <button type="submit" class="btn btn-primary flex-fill">
-                            <i class="bi bi-search me-1"></i>查詢
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            Filter
                         </button>
-                        <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary flex-fill">
-                            <i class="bi bi-arrow-clockwise me-1"></i>清除
+                        <a href="{{ url_for('transactions.index') }}" class="btn btn-light border" title="Clear">
+                            <i class="bi bi-arrow-counterclockwise"></i>
                         </a>
                     </div>
                 </div>
@@ -64,10 +64,10 @@
 <!-- Create Transaction Modal -->
 {{ transaction_modal(
 modal_id='createTransactionModal',
-modal_title='新增交易',
+modal_title='New Transaction',
 form_action=url_for('transactions.index'),
 form_method='post',
-submit_text='Submit',
+submit_text='Add Transaction',
 item='',
 category_id='',
 expense='',
@@ -80,10 +80,10 @@ is_edit=False
 <!-- Edit Transaction Modal -->
 {{ transaction_modal(
 modal_id='editTransactionModal',
-modal_title='編輯交易',
+modal_title='Edit Transaction',
 form_action='#',
 form_method='post',
-submit_text='Submit',
+submit_text='Save Changes',
 item='',
 category_id='',
 expense='',
@@ -97,81 +97,88 @@ is_edit=True
 <div class="modal fade" id="deleteTransactionModal" tabindex="-1" aria-labelledby="deleteTransactionModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow">
             <form id="deleteTransactionForm" action="#" method="post">
                 <input type="hidden" name="_method" value="DELETE">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteTransactionModalLabel">刪除交易</h5>
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="deleteTransactionModalLabel">Delete Transaction</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p>是否確定要刪除該筆交易？</p>
+                <div class="modal-body py-4">
+                    <p class="text-center text-muted mb-0">Are you sure you want to delete this transaction?</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-danger">確定</button>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger px-4">Delete</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- 交易清單 -->
-<div class="card shadow-sm">
-    <div class="card-header bg-white border-bottom">
-        <h6 class="card-title mb-0">
-            <i class="bi bi-list-ul me-2"></i>交易清單
+<!-- Transaction List -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+            <i class="bi bi-list-ul me-1"></i>Transaction List
         </h6>
     </div>
-    <div class="card-body p-0">
+    <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
                     <tr>
-                        <th class="fw-semibold">Date</th>
-                        <th class="fw-semibold">Item</th>
-                        <th class="fw-semibold">Category</th>
-                        <th class="fw-semibold">Expense</th>
-                        <th class="fw-semibold">Remark</th>
-                        <th class="fw-semibold text-center" style="width: 120px;">Action</th>
+                        <th class="fw-bold text-muted small text-uppercase ps-3">Date</th>
+                        <th class="fw-bold text-muted small text-uppercase">Item</th>
+                        <th class="fw-bold text-muted small text-uppercase">Category</th>
+                        <th class="fw-bold text-muted small text-uppercase">Expense</th>
+                        <th class="fw-bold text-muted small text-uppercase">Remark</th>
+                        <th class="fw-bold text-muted small text-uppercase text-end pe-3" style="width: 100px;">Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
         {% for t in transactions %}
-        <tr class="align-middle">
-            <td>
-                <span class="text-dark">
-                    {{ t.transaction_at.strftime('%Y/%m/%d') if t.transaction_at else '--' }}
+        <tr>
+            <td class="ps-3">
+                <span class="text-secondary fw-medium">
+                    {{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '--' }}
                 </span>
             </td>
-            <td class="fw-medium">{{ t.item }}</td>
+            <td class="fw-medium text-dark">{{ t.item }}</td>
             <td>
                 {% if t.category %}
-                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                    <span class="badge rounded-pill bg-light text-secondary border">
                         {{ t.category.name }}
                     </span>
                 {% else %}
-                    <span class="text-muted">--</span>
+                    <span class="text-muted small">--</span>
                 {% endif %}
             </td>
-            <td class="fw-bold text-danger">${{ "{:,.0f}".format(t.expense) if t.expense else '0' }}</td>
-            <td class="text-muted small">{{ t.remark if t.remark else '--' }}</td>
-            <td class="text-center">
-                <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" class="btn btn-outline-primary btn-sm edit-btn" title="編輯" 
+            <td class="fw-bold text-dark">${{ "{:,.0f}".format(t.expense) if t.expense else '0' }}</td>
+            <td class="text-muted small text-truncate" style="max-width: 150px;">{{ t.remark if t.remark else '' }}</td>
+            <td class="text-end pe-3">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-link text-decoration-none p-0 me-3 text-secondary edit-btn" title="Edit" 
                             data-bs-toggle="modal" data-bs-target="#editTransactionModal" 
                             data-id="{{ t.id }}" data-item="{{ t.item }}" 
                             data-category="{{ t.category_id }}" data-expense="{{ t.expense }}"
                             data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}"
                             data-remark="{{ t.remark if t.remark else '' }}">
-                        <i class="bi bi-pencil"></i>
+                        <i class="bi bi-pencil-square"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" title="刪除" 
+                    <button type="button" class="btn btn-link text-decoration-none p-0 text-danger delete-btn" title="Delete" 
                             data-bs-toggle="modal" data-bs-target="#deleteTransactionModal" 
                             data-id="{{ t.id }}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                No transactions found.
             </td>
         </tr>
         {% endfor %}
@@ -185,8 +192,7 @@ is_edit=True
 <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
     <div>
         <small class="text-muted">
-            <i class="bi bi-info-circle me-1"></i>
-            共 {{ total_pages * 5 }} 筆交易，目前第 {{ current_page }} / {{ total_pages }} 頁
+            On page {{ current_page }} of {{ total_pages }} (Total {{ total_pages * 5 }} records)
         </small>
     </div>
     <nav aria-label="Page navigation">

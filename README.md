@@ -46,10 +46,30 @@ flask db migrate -m "Add your migration message here"
 flask db upgrade
 ```
 
+## Feature Plan
+
+Home Page (`/`)
+- [ ] **Today's Snapshot**: Display total expenses for "Today" and "This Week".
+- [ ] **Quick Add Widget**: A simplified form for quick transaction entry (Amount, Category, Note).
+- [ ] **Weekly Overview**: A visual summary (bar chart) of daily expenses for the current week.
+- [ ] **AI Financial Advisor**: Integrate LLM to analyze current financial status and provide actionable advice.
+
+Report Page (`/reports`)
+- [x] **Month Navigator**: Allow users to switch between months to view historical data.
+- [x] **Month-End Projection**: Estimate total monthly expenses based on current daily spending average.
+- [x] **MoM Comparison**: Month-over-Month comparison to show spending trends vs previous periods.
+- [ ] **Income & Balance**: Support Revenue/Income tracking and calculate Net Income.
+
+Transaction Page (`/transactions`)
+- [ ] **Daily Grouping**: Group transactions by date (e.g., "Today", "Yesterday") for better readability.
+- [ ] **RESTful API Improvements**: Return JSON/204 for PUT/DELETE actions to handle UI updates via JS instead of page reloads.
+- [ ] **Data Validation**: enhance backend validation for dates and amounts.
+
 ## History
 
 Table of changes made to the project.
 
-| Date | Version | Description                      |
-| ---- | ------- | -------------------------------- |
+| Date | Version | Description |
+| ---- | ------- | ----------- |
+| 2026-01-19 | 1.3.0 | * Enhance Report page (Month Nav, MoM, Projection)<br>* Unify Transaction page UI integration<br>* Add seed data script |
 | -    | 1.2.2   | * Add history table in README.md |

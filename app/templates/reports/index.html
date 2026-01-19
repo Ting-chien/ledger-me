@@ -5,32 +5,31 @@
 <!-- Title -->
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
     <h1 class="m-0">Reports &amp; Analytics</h1>
+    <div class="d-flex align-items-center">
+        <button class="btn btn-outline-secondary btn-sm me-2" onclick="changeMonth(-1)">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <span id="currentMonthLabel" class="fw-bold mx-2" style="font-size: 1.2rem; min-width: 100px; text-align: center;"></span>
+        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="changeMonth(1)">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
 </div>
 
 <!-- Report Widgets -->
 <div class="container mt-4 mb-4">
-    <div class="row mb-4">
+    <div class="row g-4 mb-4">
         <div class="col-md-4">
             {% include "reports/total_expenses.html" %}
         </div>
         <div class="col-md-4">
-            <div class="card h-100 d-flex flex-column" style="aspect-ratio: 1.5 / 1;">
-                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
-                    <i class="bi bi-graph-up text-muted" style="font-size: 3rem;"></i>
-                    <p class="text-muted mt-3 mb-0">Coming Soon</p>
-                </div>
-            </div>
+            {% include "reports/mom_comparison.html" %}
         </div>
         <div class="col-md-4">
-            <div class="card h-100 d-flex flex-column" style="aspect-ratio: 1.5 / 1;">
-                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
-                    <i class="bi bi-pie-chart text-muted" style="font-size: 3rem;"></i>
-                    <p class="text-muted mt-3 mb-0">Coming Soon</p>
-                </div>
-            </div>
+            {% include "reports/month_projection.html" %}
         </div>
     </div>
-    <div class="row">
+    <div class="row g-4">
         <div class="col-md-4">
             {% include "reports/expenses_breakdown.html" %}
         </div>
@@ -42,10 +41,31 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 總是以月為單位載入所有 widgets
-    window.fetchAndRenderTotalExpense('month');
-    window.fetchAndRenderBreakdown('month');
-    window.fetchAndRenderTrend('month');
+    let currentDate = new Date();
+
+    function updateReport() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1; // JS months are 0-11
+        
+        // Update label
+        const monthStr = String(month).padStart(2, '0');
+        document.getElementById('currentMonthLabel').textContent = `${year}-${monthStr}`;
+        
+        // Fetch data
+        if (window.fetchAndRenderTotalExpense) window.fetchAndRenderTotalExpense(year, month);
+        if (window.fetchAndRenderBreakdown) window.fetchAndRenderBreakdown(year, month);
+        if (window.fetchAndRenderTrend) window.fetchAndRenderTrend(year, month);
+        if (window.fetchAndRenderProjection) window.fetchAndRenderProjection(year, month);
+        if (window.fetchAndRenderMoM) window.fetchAndRenderMoM(year, month);
+    }
+    
+    window.changeMonth = function(offset) {
+        currentDate.setMonth(currentDate.getMonth() + offset);
+        updateReport();
+    }
+    
+    // Initial load
+    updateReport();
 });
 </script>
 {% endblock %}
