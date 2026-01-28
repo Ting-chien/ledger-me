@@ -15,6 +15,10 @@ class Transaction(db.Model):
 	created_at = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 	remark = db.Column(db.Text, nullable=True)
+    
+	@property
+	def date_str(self):
+		return self.transaction_at.strftime('%Y-%m-%d') if self.transaction_at else ''
 
 	category = db.relationship('TransactionCategory', backref='transactions', passive_deletes=True)
 

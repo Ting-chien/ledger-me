@@ -69,18 +69,43 @@ def index():
 @blueprint.route("/<int:transaction_id>", methods=["PUT"])
 def update(transaction_id):
     t = Transaction.query.get_or_404(transaction_id)
+    
+    # Form data extraction
     item = request.form.get("item")
     category_id = request.form.get("category")
     expense = request.form.get("expense")
     transaction_at = request.form.get("date")
     remark = request.form.get("remark")
+
+    # Validation
+    if not item or not expense or not transaction_at:
+        return jsonify({"error": "Missing required fields"}), 400
+    
+    try:
+        expense_val = int(expense)
+    except ValueError:
+        return jsonify({"error": "Expense must be a number"}), 400
+
+    # Update fields
     t.item = item
     t.category_id = category_id if category_id else None
-    t.expense = expense
+    t.expense = expense_val
     t.transaction_at = transaction_at
     t.remark = remark
+    
     db.session.commit()
-    return redirect(url_for("transactions.index"))
+    
+    return jsonify({
+        "success": True, 
+        "transaction": {
+            "id": t.id,
+            "item": t.item,
+            "category_id": t.category_id,
+            "expense": t.expense,
+            "date": t.transaction_at.strftime('%Y-%m-%d'),
+            "remark": t.remark
+        }
+    })
 
 
 @blueprint.route("/<int:transaction_id>", methods=["DELETE"])
@@ -88,4 +113,4 @@ def delete(transaction_id):
     t = Transaction.query.get_or_404(transaction_id)
     db.session.delete(t)
     db.session.commit()
-    return redirect(url_for("transactions.index"))
+    return '', 204

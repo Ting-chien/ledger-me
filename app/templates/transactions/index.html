@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
 {% block page_content %}
 
 <!-- Title -->
@@ -24,9 +28,10 @@
                 <div class="col-md-3">
                     <label for="search" class="form-label small text-muted fw-bold">SEARCH</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" class="form-control border-start-0 ps-0" id="search" name="search" 
-                           placeholder="Item name..." value="{{ search_text }}">
+                        <span class="input-group-text bg-light border-end-0"><i
+                                class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="search" name="search"
+                            placeholder="Item name..." value="{{ search_text }}">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -34,15 +39,15 @@
                     <select class="form-select" id="category" name="category">
                         <option value="">All Categories</option>
                         {% for c in categories %}
-                        <option value="{{ c.id }}" {% if c.id|string == category_filter|string %}selected{% endif %}>
+                        <option value="{{ c.id }}" {% if c.id|string==category_filter|string %}selected{% endif %}>
                             {{ c.name }}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="date" class="form-label small text-muted fw-bold">DATE</label>
-                    <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
+                    <label for="filter_date" class="form-label small text-muted fw-bold">DATE</label>
+                    <input type="text" class="form-control bg-white" id="filter_date" name="date" value="{{ date_filter }}" placeholder="Select Date">
                 </div>
                 <div class="col-md-3">
                     <div class="d-flex gap-2">
@@ -128,61 +133,70 @@ is_edit=True
             <table class="table table-hover align-middle">
                 <thead class="bg-light">
                     <tr>
-                        <th class="fw-bold text-muted small text-uppercase ps-3">Date</th>
-                        <th class="fw-bold text-muted small text-uppercase">Item</th>
+                        <th class="fw-bold text-muted small text-uppercase ps-3">Item</th>
                         <th class="fw-bold text-muted small text-uppercase">Category</th>
                         <th class="fw-bold text-muted small text-uppercase">Expense</th>
                         <th class="fw-bold text-muted small text-uppercase">Remark</th>
-                        <th class="fw-bold text-muted small text-uppercase text-end pe-3" style="width: 100px;">Action</th>
+                        <th class="fw-bold text-muted small text-uppercase text-end pe-3" style="width: 100px;">Action
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="border-top-0">
-        {% for t in transactions %}
-        <tr>
-            <td class="ps-3">
-                <span class="text-secondary fw-medium">
-                    {{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '--' }}
-                </span>
-            </td>
-            <td class="fw-medium text-dark">{{ t.item }}</td>
-            <td>
-                {% if t.category %}
-                    <span class="badge rounded-pill bg-light text-secondary border">
-                        {{ t.category.name }}
-                    </span>
-                {% else %}
-                    <span class="text-muted small">--</span>
-                {% endif %}
-            </td>
-            <td class="fw-bold text-dark">${{ "{:,.0f}".format(t.expense) if t.expense else '0' }}</td>
-            <td class="text-muted small text-truncate" style="max-width: 150px;">{{ t.remark if t.remark else '' }}</td>
-            <td class="text-end pe-3">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-link text-decoration-none p-0 me-3 text-secondary edit-btn" title="Edit" 
-                            data-bs-toggle="modal" data-bs-target="#editTransactionModal" 
-                            data-id="{{ t.id }}" data-item="{{ t.item }}" 
-                            data-category="{{ t.category_id }}" data-expense="{{ t.expense }}"
-                            data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}"
-                            data-remark="{{ t.remark if t.remark else '' }}">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button type="button" class="btn btn-link text-decoration-none p-0 text-danger delete-btn" title="Delete" 
-                            data-bs-toggle="modal" data-bs-target="#deleteTransactionModal" 
-                            data-id="{{ t.id }}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6" class="text-center py-5 text-muted">
-                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                No transactions found.
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+                    {% for group in transactions|groupby('date_str') %}
+                    {% set daily_total = group.list | sum(attribute='expense') %}
+                    <tr class="bg-light">
+                        <td colspan="5" class="fw-bold text-secondary ps-3 py-2 small">
+                            <div class="d-flex justify-content-between">
+                                <span><i class="bi bi-calendar3 me-2"></i>{{ group.grouper }}</span>
+                                <span class="pe-3">Total: ${{ "{:,.0f}".format(daily_total) }}</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% for t in group.list %}
+                    <tr data-id="{{ t.id }}">
+                        <td class="fw-medium text-dark ps-3">{{ t.item }}</td>
+                        <td>
+                            {% if t.category %}
+                            <span class="badge rounded-pill bg-light text-secondary border">
+                                {{ t.category.name }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">--</span>
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold text-dark">${{ "{:,.0f}".format(t.expense) if t.expense else '0' }}</td>
+                        <td class="text-muted small text-truncate" style="max-width: 150px;">{{ t.remark if t.remark
+                            else '' }}</td>
+                        <td class="text-end pe-3">
+                            <div class="btn-group">
+                                <button type="button"
+                                    class="btn btn-link text-decoration-none p-0 me-3 text-secondary edit-btn"
+                                    title="Edit" data-bs-toggle="modal" data-bs-target="#editTransactionModal"
+                                    data-id="{{ t.id }}" data-item="{{ t.item }}" data-category="{{ t.category_id }}"
+                                    data-expense="{{ t.expense }}"
+                                    data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}"
+                                    data-remark="{{ t.remark if t.remark else '' }}">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button type="button"
+                                    class="btn btn-link text-decoration-none p-0 text-danger delete-btn" title="Delete"
+                                    data-bs-toggle="modal" data-bs-target="#deleteTransactionModal"
+                                    data-id="{{ t.id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            No transactions found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
     </div>
@@ -197,129 +211,178 @@ is_edit=True
     </div>
     <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm mb-0">
-        <!-- Previous Page -->
-        {% if current_page > 1 %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=current_page-1, search=search_text, category=category_filter, date=date_filter) }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </span>
-        </li>
-        {% endif %}
-
-        <!-- Condensed Page Numbers -->
-        {% set page_window = 2 %}
-        {% set start_page = current_page - page_window if current_page - page_window > 1 else 1 %}
-        {% set end_page = current_page + page_window if current_page + page_window < total_pages else total_pages %}
-
-        {# Always show first page #}
-        {% if start_page > 1 %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=1, search=search_text, category=category_filter, date=date_filter) }}">1</a>
-        </li>
-        {% if start_page > 2 %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        {% endif %}
-        {% endif %}
-
-        {# Main window #}
-        {% for page_num in range(start_page, end_page + 1) %}
-            {% if page_num == current_page %}
-            <li class="page-item active">
-                <span class="page-link">{{ page_num }}</span>
+            <!-- Previous Page -->
+            {% if current_page > 1 %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="{{ url_for('transactions.index', page=current_page-1, search=search_text, category=category_filter, date=date_filter) }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
             </li>
             {% else %}
-            <li class="page-item">
-                <a class="page-link" href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{ page_num }}</a>
+            <li class="page-item disabled">
+                <span class="page-link" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
             </li>
             {% endif %}
-        {% endfor %}
 
-        {# Always show last page #}
-        {% if end_page < total_pages %}
-        {% if end_page < total_pages - 1 %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
-        {% endif %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=total_pages, search=search_text, category=category_filter, date=date_filter) }}">{{ total_pages }}</a>
-        </li>
-        {% endif %}
+            <!-- Condensed Page Numbers -->
+            {% set page_window = 2 %}
+            {% set start_page = current_page - page_window if current_page - page_window > 1 else 1 %}
+            {% set end_page = current_page + page_window if current_page + page_window < total_pages else total_pages %}
+                {# Always show first page #} {% if start_page> 1 %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="{{ url_for('transactions.index', page=1, search=search_text, category=category_filter, date=date_filter) }}">1</a>
+                </li>
+                {% if start_page > 2 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+                {% endif %}
 
-        <!-- Next Page -->
-        {% if current_page < total_pages %}
-        <li class="page-item">
-            <a class="page-link" href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter) }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <span class="page-link" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </span>
-        </li>
-        {% endif %}
+                {# Main window #}
+                {% for page_num in range(start_page, end_page + 1) %}
+                {% if page_num == current_page %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{
+                        page_num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {# Always show last page #}
+                {% if end_page < total_pages %} {% if end_page < total_pages - 1 %} <li class="page-item disabled"><span
+                        class="page-link">...</span></li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="{{ url_for('transactions.index', page=total_pages, search=search_text, category=category_filter, date=date_filter) }}">{{
+                            total_pages }}</a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Next Page -->
+                    {% if current_page < total_pages %} <li class="page-item">
+                        <a class="page-link"
+                            href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter) }}"
+                            aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </span>
+                        </li>
+                        {% endif %}
         </ul>
     </nav>
 </div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        
+        // Initialize Flatpickr for Filter
+        flatpickr("#filter_date", {
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
 
-        // 編輯
+        // Initialize Flatpickr for Create Modal
+        flatpickr("#date", {
+            dateFormat: "Y-m-d",
+            allowInput: true,
+            defaultDate: "today"
+        });
+
+        // Initialize Flatpickr for Edit Modal
+        flatpickr("#edit-date", {
+            dateFormat: "Y-m-d",
+            allowInput: true
+        });
+
+        // 編輯 Data Binding
         var editModal = document.getElementById('editTransactionModal');
         var editForm = document.getElementById('editTransactionForm');
-        var editBtns = document.querySelectorAll('.edit-btn');
-        editBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                document.getElementById('edit-id').value = btn.getAttribute('data-id');
-                document.getElementById('edit-item').value = btn.getAttribute('data-item');
-                document.getElementById('edit-category').value = btn.getAttribute('data-category');
-                document.getElementById('edit-expense').value = btn.getAttribute('data-expense');
-                document.getElementById('edit-date').value = btn.getAttribute('data-date');
-                document.getElementById('edit-remark').value = btn.getAttribute('data-remark');
-                editForm.action = '/transactions/' + btn.getAttribute('data-id');
+        
+        function bindEditButtons() {
+            document.querySelectorAll('.edit-btn').forEach(function (btn) {
+                btn.onclick = function () {
+                    var id = btn.getAttribute('data-id');
+                    var date = btn.getAttribute('data-date');
+                    document.getElementById('edit-id').value = id;
+                    document.getElementById('edit-item').value = btn.getAttribute('data-item');
+                    document.getElementById('edit-category').value = btn.getAttribute('data-category');
+                    document.getElementById('edit-expense').value = btn.getAttribute('data-expense');
+                    
+                    // Update Flatpickr or Input
+                    var editDateInput = document.getElementById('edit-date');
+                    if(editDateInput._flatpickr) {
+                        editDateInput._flatpickr.setDate(date);
+                    } else {
+                        editDateInput.value = date;
+                    }
+                    
+                    document.getElementById('edit-remark').value = btn.getAttribute('data-remark');
+
+                    editForm.action = '/transactions/' + id;
+                };
             });
-        });
+        }
+        bindEditButtons();
+
+        // Edit Submit
         editForm.addEventListener('submit', function (e) {
             e.preventDefault();
             var formData = new FormData(editForm);
             fetch(editForm.action, {
                 method: 'PUT',
                 body: formData
-            }).then(function (resp) {
-                if (resp.redirected) {
-                    window.location.href = resp.url;
-                } else {
-                    window.location.reload();
-                }
-            });
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                         // Reload to update total amounts and groupings
+                         window.location.reload();
+                    } else {
+                        alert(data.error || 'Update failed');
+                    }
+                });
         });
 
-        // 刪除
+        // Delete
         var deleteForm = document.getElementById('deleteTransactionForm');
-        var deleteBtns = document.querySelectorAll('.delete-btn');
-        deleteBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                deleteForm.action = '/transactions/' + btn.getAttribute('data-id');
+        
+        function bindDeleteButtons() {
+            document.querySelectorAll('.delete-btn').forEach(function (btn) {
+                btn.onclick = function () {
+                    var id = btn.getAttribute('data-id');
+                    deleteForm.action = '/transactions/' + id;
+                };
             });
-        });
+        }
+        bindDeleteButtons();
+
         deleteForm.addEventListener('submit', function (e) {
             e.preventDefault();
             fetch(deleteForm.action, {
                 method: 'DELETE'
             }).then(function (resp) {
-                if (resp.redirected) {
-                    window.location.href = resp.url;
-                } else {
+                if (resp.status === 204) {
                     window.location.reload();
+                } else {
+                    alert('Delete failed');
                 }
             });
         });

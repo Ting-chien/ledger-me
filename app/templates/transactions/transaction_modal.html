@@ -72,7 +72,7 @@
 
                     <div class="mb-3">
                         <label for="{{ 'edit-date' if is_edit else 'date' }}" class="form-label small text-muted fw-bold">DATE</label>
-                        <input type="date" class="form-control" id="{{ 'edit-date' if is_edit else 'date' }}" name="date" value="{{ date }}">
+                        <input type="text" class="form-control bg-white datepicker-input" id="{{ 'edit-date' if is_edit else 'date' }}" name="date" value="{{ date }}" placeholder="Select Date">
                     </div>
 
                     <div class="mb-3">

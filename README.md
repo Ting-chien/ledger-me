@@ -61,10 +61,10 @@ Report Page (`/reports`)
 - [ ] **Income & Balance**: Support Revenue/Income tracking and calculate Net Income.
 
 Transaction Page (`/transactions`)
-- [ ] **Daily Grouping**: Group transactions by date (e.g., "Today", "Yesterday") for better readability.
-- [ ] **RESTful API Improvements**: Return JSON/204 for PUT/DELETE actions to handle UI updates via JS instead of page reloads.
-- [ ] **Data Validation**: enhance backend validation for dates and amounts.
-- [ ] Optimize calander UI in transaction modal
+- [x] **Daily Grouping**: Group transactions by date (e.g., "Today", "Yesterday") for better readability.
+- [x] **RESTful API Improvements**: Return JSON/204 for PUT/DELETE actions to handle UI updates via JS instead of page reloads.
+- [x] **Data Validation**: enhance backend validation for dates and amounts.
+- [x] Optimize calander UI in transaction modal
 
 ## History
 
