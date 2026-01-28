@@ -1,0 +1,53 @@
+<div class="card h-100 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+            Top 5 High Expenses
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="topExpensesTable">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="fw-bold text-muted small text-uppercase" style="width: 10%;">#</th>
+                        <th class="fw-bold text-muted small text-uppercase">Item</th>
+                        <th class="fw-bold text-muted small text-uppercase">Category</th>
+                        <th class="fw-bold text-muted small text-uppercase">Date</th>
+                        <th class="fw-bold text-muted small text-uppercase text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="topExpensesBody">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    window.fetchAndRenderTopExpenses = function (year, month) {
+        const query = (year && month) ? `?year=${year}&month=${month}` : '';
+        fetch(`/dashboard/top-expenses${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('topExpensesBody');
+                if (data.top_expenses && data.top_expenses.length > 0) {
+                    tbody.innerHTML = data.top_expenses.map((item, index) => `
+                        <tr>
+                            <td class="text-muted">${index + 1}</td>
+                            <td class="fw-medium">${item.item}</td>
+                            <td><span class="badge rounded-pill bg-light text-secondary border">${item.category}</span></td>
+                            <td class="text-muted small">${item.date}</td>
+                            <td class="text-end fw-bold text-danger">$${Number(item.expense).toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">No expenses found</td></tr>';
+                }
+            })
+            .catch(() => {
+                document.getElementById('topExpensesBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Error loading data</td></tr>';
+            });
+    };
+</script>

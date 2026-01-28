@@ -1,0 +1,33 @@
+<div id="total-balance-card" class="card h-100 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">Total Balance</h6>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center align-items-center py-4">
+        <div id="total-balance-value" class="display-5 fw-bold">--</div>
+        <div class="text-muted small mt-2 invisible">Placeholder</div> <!-- Invisible spacer to match height with other cards -->
+    </div>
+</div>
+<script>
+    window.fetchAndRenderTotalBalance = function (year, month) {
+        const query = (year && month) ? `?year=${year}&month=${month}` : '';
+        fetch(`/dashboard/total-balance${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const balance = data.balance;
+                const balanceEl = document.getElementById('total-balance-value');
+                balanceEl.textContent = '$' + Number(balance).toLocaleString();
+                
+                // Color based on positive/negative balance
+                if (balance > 0) {
+                    balanceEl.className = 'display-5 fw-bold text-success';
+                } else if (balance < 0) {
+                    balanceEl.className = 'display-5 fw-bold text-danger';
+                } else {
+                    balanceEl.className = 'display-5 fw-bold text-dark';
+                }
+            })
+            .catch(() => {
+                document.getElementById('total-balance-value').textContent = '--';
+            });
+    };
+</script>

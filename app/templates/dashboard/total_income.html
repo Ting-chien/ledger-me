@@ -1,0 +1,22 @@
+<div id="total-income-card" class="card h-100 shadow-sm border-0">
+    <div class="card-header bg-transparent border-0 pt-3 pb-0">
+        <h6 class="text-uppercase text-muted fw-bold mb-0" style="font-size: 0.75rem; letter-spacing: 0.05em;">Total Income</h6>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-center align-items-center py-4">
+        <div id="total-income-value" class="display-5 fw-bold">--</div>
+        <div class="text-muted small mt-2 invisible">Placeholder</div> <!-- Invisible spacer to match height with other cards -->
+    </div>
+</div>
+<script>
+    window.fetchAndRenderTotalIncome = function (year, month) {
+        const query = (year && month) ? `?year=${year}&month=${month}` : '';
+        fetch(`/dashboard/total-income${query}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-income-value').textContent = '$' + Number(data.total_income ?? 0).toLocaleString();
+            })
+            .catch(() => {
+                document.getElementById('total-income-value').textContent = '--';
+            });
+    };
+</script>

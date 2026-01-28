@@ -1,22 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bootstrap demo</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-  </head>
-  <body>
-    <h1>Hello LedgerMe!</h1>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<!-- Hero Section -->
+<div class="container mt-5 mb-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold mb-4">Welcome to LedgerMe</h1>
+            <p class="lead text-muted mb-4">
+                Your personal finance tracker to manage expenses, track spending, and gain insights into your financial habits.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-speedometer2 me-2"></i>View Dashboard
+                </a>
+                <a href="{{ url_for('transactions.index') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="bi bi-plus-lg me-2"></i>Add Transaction
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 text-center">
+            <i class="bi bi-wallet2 text-primary" style="font-size: 12rem; opacity: 0.1;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-graph-up text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-2">Track Expenses</h5>
+                    <p class="text-muted">Monitor your daily spending and categorize transactions easily</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-bar-chart text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-2">Visual Analytics</h5>
+                    <p class="text-muted">Get insights with interactive charts and trend analysis</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-calendar-check text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-2">Monthly Reports</h5>
+                    <p class="text-muted">Review your spending patterns and plan better</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

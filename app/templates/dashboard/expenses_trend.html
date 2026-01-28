@@ -14,7 +14,7 @@
     let chartInstance = null;
     window.fetchAndRenderTrend = function (year, month) {
         const query = (year && month) ? `?year=${year}&month=${month}` : '';
-        fetch(`/reports/expenses-trend${query}`)
+        fetch(`/dashboard/expenses-trend${query}`)
             .then((resp) => resp.json())
             .then((data) => {
                 const ctx = document

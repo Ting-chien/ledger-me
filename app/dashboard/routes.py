@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import render_template, jsonify, request
 from sqlalchemy import func
 from datetime import date, timedelta
 import calendar
@@ -9,7 +9,7 @@ from app.transactions.models import Transaction, TransactionCategory
 
 @blueprint.route('/')
 def index():
-    return render_template('reports/index.html')
+    return render_template('dashboard/index.html')
 
 
 def get_month_range(year=None, month=None):
@@ -45,12 +45,64 @@ def get_total_expenses():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= start,
-            func.date(Transaction.transaction_at) <= end
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
         )
         .with_entities(func.sum(Transaction.expense))
         .scalar() or 0
     )
     return jsonify({"total_expenses": int(total)})
+
+
+@blueprint.route('/total-income')
+def get_total_income():
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+
+    total = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'income'
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    return jsonify({"total_income": int(total)})
+
+
+@blueprint.route('/total-balance')
+def get_total_balance():
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+
+    income = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'income'
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    
+    expenses = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
+        )
+        .with_entities(func.sum(Transaction.expense))
+        .scalar() or 0
+    )
+    
+    balance = int(income) - int(expenses)
+    return jsonify({"balance": balance, "income": int(income), "expenses": int(expenses)})
 
 
 @blueprint.route('/month-projection')
@@ -64,7 +116,8 @@ def get_month_projection():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= start,
-            func.date(Transaction.transaction_at) <= end
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
         )
         .with_entities(func.sum(Transaction.expense))
         .scalar() or 0
@@ -112,7 +165,8 @@ def get_mom_comparison():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= start,
-            func.date(Transaction.transaction_at) <= end
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
         )
         .with_entities(func.sum(Transaction.expense))
         .scalar() or 0
@@ -123,7 +177,8 @@ def get_mom_comparison():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= prev_start,
-            func.date(Transaction.transaction_at) <= prev_end
+            func.date(Transaction.transaction_at) <= prev_end,
+            Transaction.type == 'expense'
         )
         .with_entities(func.sum(Transaction.expense))
         .scalar() or 0
@@ -156,7 +211,8 @@ def get_expenses_breakdown():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= start,
-            func.date(Transaction.transaction_at) <= end
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
         )
         .join(TransactionCategory, Transaction.category_id == TransactionCategory.id)
         .with_entities(TransactionCategory.name, func.sum(Transaction.expense))
@@ -179,7 +235,8 @@ def get_expenses_trend():
         Transaction.query
         .filter(
             func.date(Transaction.transaction_at) >= start,
-            func.date(Transaction.transaction_at) <= end
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
         )
         .with_entities(
             func.date(Transaction.transaction_at).label('date'),
@@ -206,3 +263,32 @@ def get_expenses_trend():
     chart_data = [expenses_dict[d] for d in sorted(expenses_dict.keys())]
     
     return jsonify({"labels": chart_labels, "data": chart_data})
+
+
+@blueprint.route('/top-expenses')
+def get_top_expenses():
+    year = request.args.get('year')
+    month = request.args.get('month')
+    start, end = get_month_range(year, month)
+    
+    # 查詢當月前5筆最高金額的支出
+    results = (
+        Transaction.query
+        .filter(
+            func.date(Transaction.transaction_at) >= start,
+            func.date(Transaction.transaction_at) <= end,
+            Transaction.type == 'expense'
+        )
+        .order_by(Transaction.expense.desc())
+        .limit(5)
+        .all()
+    )
+    
+    data = [{
+        'item': t.item,
+        'expense': int(t.expense),
+        'category': t.category.name if t.category else 'N/A',
+        'date': t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else 'N/A'
+    } for t in results]
+    
+    return jsonify({"top_expenses": data})

@@ -10,7 +10,7 @@
 <script>
     window.fetchAndRenderTotalExpense = function (year, month) {
         const query = (year && month) ? `?year=${year}&month=${month}` : '';
-        fetch(`/reports/total-expenses${query}`)
+        fetch(`/dashboard/total-expenses${query}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('total-expenses-value').textContent = '$' + Number(data.total_expenses ?? 0).toLocaleString();

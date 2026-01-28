@@ -10,7 +10,7 @@
 <script>
     window.fetchAndRenderMoM = function (year, month) {
         const query = (year && month) ? `?year=${year}&month=${month}` : '';
-        fetch(`/reports/mom-comparison${query}`)
+        fetch(`/dashboard/mom-comparison${query}`)
             .then(response => response.json())
             .then(data => {
                 const percent = data.diff_percent;

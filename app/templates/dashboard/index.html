@@ -4,7 +4,7 @@
 
 <!-- Title -->
 <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
-    <h1 class="m-0">Reports &amp; Analytics</h1>
+    <h1 class="m-0">Dashboard</h1>
     <div class="d-flex align-items-center">
         <button class="btn btn-outline-secondary btn-sm me-2" onclick="changeMonth(-1)">
             <i class="bi bi-chevron-left"></i>
@@ -20,21 +20,30 @@
 <div class="container mt-4 mb-4">
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            {% include "reports/total_expenses.html" %}
+            {% include "dashboard/total_balance.html" %}
         </div>
         <div class="col-md-4">
-            {% include "reports/mom_comparison.html" %}
+            {% include "dashboard/total_income.html" %}
         </div>
         <div class="col-md-4">
-            {% include "reports/month_projection.html" %}
+            {% include "dashboard/total_expenses.html" %}
         </div>
     </div>
     <div class="row g-4">
         <div class="col-md-4">
-            {% include "reports/expenses_breakdown.html" %}
+            <div style="height: 700px;">
+                {% include "dashboard/expenses_breakdown.html" %}
+            </div>
         </div>
         <div class="col-md-8">
-            {% include "reports/expenses_trend.html" %}
+            <div class="row g-4">
+                <div class="col-12">
+                    {% include "dashboard/expenses_trend.html" %}
+                </div>
+                <div class="col-12">
+                    {% include "dashboard/top_expenses.html" %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -52,11 +61,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('currentMonthLabel').textContent = `${year}-${monthStr}`;
         
         // Fetch data
+        if (window.fetchAndRenderTotalBalance) window.fetchAndRenderTotalBalance(year, month);
+        if (window.fetchAndRenderTotalIncome) window.fetchAndRenderTotalIncome(year, month);
         if (window.fetchAndRenderTotalExpense) window.fetchAndRenderTotalExpense(year, month);
         if (window.fetchAndRenderBreakdown) window.fetchAndRenderBreakdown(year, month);
         if (window.fetchAndRenderTrend) window.fetchAndRenderTrend(year, month);
-        if (window.fetchAndRenderProjection) window.fetchAndRenderProjection(year, month);
-        if (window.fetchAndRenderMoM) window.fetchAndRenderMoM(year, month);
+        if (window.fetchAndRenderTopExpenses) window.fetchAndRenderTopExpenses(year, month);
     }
     
     window.changeMonth = function(offset) {

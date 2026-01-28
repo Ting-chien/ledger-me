@@ -13,7 +13,7 @@ migrate = Migrate()
 
 
 def register_blueprints(app):
-    for module_name in ["transactions", "reports"]:
+    for module_name in ["transactions", "dashboard"]:
         module = import_module('app.{}.routes'.format(module_name))
         app.register_blueprint(module.blueprint)
 
@@ -77,7 +77,7 @@ def create_app(config):
 
     @app.route('/')
     def index():
-        return render_template("base.html")
+        return render_template("index.html")
 
     @app.route('/health')
     def health_check():

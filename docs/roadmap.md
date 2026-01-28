@@ -4,8 +4,11 @@ Feature roadmap shows features we want to add, update or fix. Requirements shoul
 
 ## v1.4.0
 
-Dashboard Page (`/`)
-- [] Move reports and charts in Report Page to Dashboard Page, the main point of Dashboard Page is to show a quick overview of the current month's expenses.
+Dashboard Page (`/dashboard`)
+- [x] Move reports and charts in Report Page to Dashboard Page, the main point of Dashboard Page is to show a quick overview of the current month's expenses.
+- [x] Replace top three cards with a summary card showing total income, total expense, and balance for the current month.
+- [x] Add a table to show top 5 expense transactions of the current month.
+- [x] Update existing charts to fit the new layout.
 
 Transaction Page (`/transactions`)
 - [x] Add a new column named `type` in model to show the type of the transaction (e.g., income, expense).
@@ -14,7 +17,7 @@ Transaction Page (`/transactions`)
 - [x] Remve the daily grouping in transaction list.
 
 Report Page (`/reports`)
-- [] Remove Report Page, move all reports to Dashboard Page.
+- [x] Remove Report Page, move all reports to Dashboard Page.
 
 Wallet Page (`/wallet`) - I want to add a wallet page to show all my wallets and their balances.
 - [] Add a card to show the total balance of the history.
