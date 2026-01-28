@@ -52,6 +52,6 @@ Table of changes made to the project.
 
 | Date       | Version | Description                                                                                                                                                         |
 | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-01-19 | 1.2.0   | * Enhance Report page (Month Nav, MoM, Projection)<br>* Unify Transaction page UI integration<br>* Add seed data script                                             |
+| 2026-01-19 | 1.2.0   | * Enhance Report page (Month Nav, MoM, Projection)<br>* Unify Transaction page UI integration<br>* Add seed data script<br> * Update UI style                       |
 | 2025-12-12 | 1.1.0   | * Add partition table for transactions<br>* Update log system in gunicorn<br>* Update sort key in transaction page<br>* Update pagination logic in transaction page |
 | 2025-11-13 | 1.0.2   | * Add history table in README.md                                                                                                                                    |

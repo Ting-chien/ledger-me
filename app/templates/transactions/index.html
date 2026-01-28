@@ -34,7 +34,15 @@
                             placeholder="Item name..." value="{{ search_text }}">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <label for="type" class="form-label small text-muted fw-bold">TYPE</label>
+                    <select class="form-select" id="type" name="type">
+                        <option value="">All Types</option>
+                        <option value="income" {% if type_filter=='income' %}selected{% endif %}>Income</option>
+                        <option value="expense" {% if type_filter=='expense' %}selected{% endif %}>Expense</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label for="category" class="form-label small text-muted fw-bold">CATEGORY</label>
                     <select class="form-select" id="category" name="category">
                         <option value="">All Categories</option>
@@ -47,9 +55,10 @@
                 </div>
                 <div class="col-md-3">
                     <label for="filter_date" class="form-label small text-muted fw-bold">DATE</label>
-                    <input type="text" class="form-control bg-white" id="filter_date" name="date" value="{{ date_filter }}" placeholder="Select Date">
+                    <input type="text" class="form-control bg-white" id="filter_date" name="date"
+                        value="{{ date_filter }}" placeholder="Select Date">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary flex-grow-1">
                             Filter
@@ -74,6 +83,7 @@ form_action=url_for('transactions.index'),
 form_method='post',
 submit_text='Add Transaction',
 item='',
+type='expense',
 category_id='',
 expense='',
 date='',
@@ -90,6 +100,7 @@ form_action='#',
 form_method='post',
 submit_text='Save Changes',
 item='',
+type='expense',
 category_id='',
 expense='',
 date='',
@@ -133,7 +144,9 @@ is_edit=True
             <table class="table table-hover align-middle">
                 <thead class="bg-light">
                     <tr>
-                        <th class="fw-bold text-muted small text-uppercase ps-3">Item</th>
+                        <th class="fw-bold text-muted small text-uppercase ps-3">Date</th>
+                        <th class="fw-bold text-muted small text-uppercase">Item</th>
+                        <th class="fw-bold text-muted small text-uppercase">Type</th>
                         <th class="fw-bold text-muted small text-uppercase">Category</th>
                         <th class="fw-bold text-muted small text-uppercase">Expense</th>
                         <th class="fw-bold text-muted small text-uppercase">Remark</th>
@@ -142,19 +155,22 @@ is_edit=True
                     </tr>
                 </thead>
                 <tbody class="border-top-0">
-                    {% for group in transactions|groupby('date_str') %}
-                    {% set daily_total = group.list | sum(attribute='expense') %}
-                    <tr class="bg-light">
-                        <td colspan="5" class="fw-bold text-secondary ps-3 py-2 small">
-                            <div class="d-flex justify-content-between">
-                                <span><i class="bi bi-calendar3 me-2"></i>{{ group.grouper }}</span>
-                                <span class="pe-3">Total: ${{ "{:,.0f}".format(daily_total) }}</span>
-                            </div>
-                        </td>
-                    </tr>
-                    {% for t in group.list %}
+                    {% for t in transactions %}
                     <tr data-id="{{ t.id }}">
-                        <td class="fw-medium text-dark ps-3">{{ t.item }}</td>
+                        <td class="text-muted small ps-3">{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at
+                            else '--' }}</td>
+                        <td class="fw-medium text-dark">{{ t.item }}</td>
+                        <td>
+                            {% if t.type == 'income' %}
+                            <span class="text-success fw-semibold">
+                                + Income
+                            </span>
+                            {% else %}
+                            <span class="text-danger fw-semibold">
+                                - Expense
+                            </span>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if t.category %}
                             <span class="badge rounded-pill bg-light text-secondary border">
@@ -172,8 +188,8 @@ is_edit=True
                                 <button type="button"
                                     class="btn btn-link text-decoration-none p-0 me-3 text-secondary edit-btn"
                                     title="Edit" data-bs-toggle="modal" data-bs-target="#editTransactionModal"
-                                    data-id="{{ t.id }}" data-item="{{ t.item }}" data-category="{{ t.category_id }}"
-                                    data-expense="{{ t.expense }}"
+                                    data-id="{{ t.id }}" data-item="{{ t.item }}" data-type="{{ t.type }}"
+                                    data-category="{{ t.category_id }}" data-expense="{{ t.expense }}"
                                     data-date="{{ t.transaction_at.strftime('%Y-%m-%d') if t.transaction_at else '' }}"
                                     data-remark="{{ t.remark if t.remark else '' }}">
                                     <i class="bi bi-pencil-square"></i>
@@ -187,10 +203,9 @@ is_edit=True
                             </div>
                         </td>
                     </tr>
-                    {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="5" class="text-center py-5 text-muted">
+                        <td colspan="7" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-1 d-block mb-3"></i>
                             No transactions found.
                         </td>
@@ -215,7 +230,7 @@ is_edit=True
             {% if current_page > 1 %}
             <li class="page-item">
                 <a class="page-link"
-                    href="{{ url_for('transactions.index', page=current_page-1, search=search_text, category=category_filter, date=date_filter) }}"
+                    href="{{ url_for('transactions.index', page=current_page-1, search=search_text, category=category_filter, date=date_filter, type=type_filter) }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
@@ -235,7 +250,7 @@ is_edit=True
                 {# Always show first page #} {% if start_page> 1 %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{ url_for('transactions.index', page=1, search=search_text, category=category_filter, date=date_filter) }}">1</a>
+                        href="{{ url_for('transactions.index', page=1, search=search_text, category=category_filter, date=date_filter, type=type_filter) }}">1</a>
                 </li>
                 {% if start_page > 2 %}
                 <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -251,7 +266,7 @@ is_edit=True
                 {% else %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter) }}">{{
+                        href="{{ url_for('transactions.index', page=page_num, search=search_text, category=category_filter, date=date_filter, type=type_filter) }}">{{
                         page_num }}</a>
                 </li>
                 {% endif %}
@@ -263,7 +278,7 @@ is_edit=True
                     {% endif %}
                     <li class="page-item">
                         <a class="page-link"
-                            href="{{ url_for('transactions.index', page=total_pages, search=search_text, category=category_filter, date=date_filter) }}">{{
+                            href="{{ url_for('transactions.index', page=total_pages, search=search_text, category=category_filter, date=date_filter, type=type_filter) }}">{{
                             total_pages }}</a>
                     </li>
                     {% endif %}
@@ -271,7 +286,7 @@ is_edit=True
                     <!-- Next Page -->
                     {% if current_page < total_pages %} <li class="page-item">
                         <a class="page-link"
-                            href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter) }}"
+                            href="{{ url_for('transactions.index', page=current_page+1, search=search_text, category=category_filter, date=date_filter, type=type_filter) }}"
                             aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
@@ -292,7 +307,7 @@ is_edit=True
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        
+
         // Initialize Flatpickr for Filter
         flatpickr("#filter_date", {
             dateFormat: "Y-m-d",
@@ -315,25 +330,33 @@ is_edit=True
         // 編輯 Data Binding
         var editModal = document.getElementById('editTransactionModal');
         var editForm = document.getElementById('editTransactionForm');
-        
+
         function bindEditButtons() {
             document.querySelectorAll('.edit-btn').forEach(function (btn) {
                 btn.onclick = function () {
                     var id = btn.getAttribute('data-id');
                     var date = btn.getAttribute('data-date');
+                    var type = btn.getAttribute('data-type');
                     document.getElementById('edit-id').value = id;
                     document.getElementById('edit-item').value = btn.getAttribute('data-item');
                     document.getElementById('edit-category').value = btn.getAttribute('data-category');
                     document.getElementById('edit-expense').value = btn.getAttribute('data-expense');
-                    
+
+                    // Set type radio button
+                    if (type === 'income') {
+                        document.getElementById('edit-type-income').checked = true;
+                    } else {
+                        document.getElementById('edit-type-expense').checked = true;
+                    }
+
                     // Update Flatpickr or Input
                     var editDateInput = document.getElementById('edit-date');
-                    if(editDateInput._flatpickr) {
+                    if (editDateInput._flatpickr) {
                         editDateInput._flatpickr.setDate(date);
                     } else {
                         editDateInput.value = date;
                     }
-                    
+
                     document.getElementById('edit-remark').value = btn.getAttribute('data-remark');
 
                     editForm.action = '/transactions/' + id;
@@ -353,8 +376,8 @@ is_edit=True
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                         // Reload to update total amounts and groupings
-                         window.location.reload();
+                        // Reload to update total amounts
+                        window.location.reload();
                     } else {
                         alert(data.error || 'Update failed');
                     }
@@ -363,7 +386,7 @@ is_edit=True
 
         // Delete
         var deleteForm = document.getElementById('deleteTransactionForm');
-        
+
         function bindDeleteButtons() {
             document.querySelectorAll('.delete-btn').forEach(function (btn) {
                 btn.onclick = function () {

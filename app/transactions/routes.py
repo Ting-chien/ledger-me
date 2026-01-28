@@ -11,12 +11,14 @@ def index():
     categories = TransactionCategory.query.order_by(TransactionCategory.name.asc()).all()
     if request.method == "POST":
         item = request.form.get("item")
+        type_ = request.form.get("type", "expense")  # Default to 'expense' if not provided
         category_id = request.form.get("category")
         expense = request.form.get("expense")
         transaction_at = request.form.get("date")
         remark = request.form.get("remark")
         new_transaction = Transaction(
             item=item,
+            type=type_,
             category_id=category_id if category_id else None,
             expense=expense,
             transaction_at=transaction_at,
@@ -30,6 +32,7 @@ def index():
     search_text = request.args.get('search', '')
     category_filter = request.args.get('category', '')
     date_filter = request.args.get('date', '')
+    type_filter = request.args.get('type', '')
 
     # 基礎查詢
     query = Transaction.query
@@ -45,6 +48,10 @@ def index():
     # 日期篩選
     if date_filter:
         query = query.filter(Transaction.transaction_at == date_filter)
+
+    # 類型篩選
+    if type_filter:
+        query = query.filter(Transaction.type == type_filter)
 
     # Pagination
     page = request.args.get('page', 1, type=int)
@@ -63,6 +70,7 @@ def index():
         search_text=search_text,
         category_filter=category_filter,
         date_filter=date_filter,
+        type_filter=type_filter,
     )
 
 
@@ -72,6 +80,7 @@ def update(transaction_id):
     
     # Form data extraction
     item = request.form.get("item")
+    type_ = request.form.get("type")
     category_id = request.form.get("category")
     expense = request.form.get("expense")
     transaction_at = request.form.get("date")
@@ -81,6 +90,9 @@ def update(transaction_id):
     if not item or not expense or not transaction_at:
         return jsonify({"error": "Missing required fields"}), 400
     
+    if type_ and type_ not in ['income', 'expense']:
+        return jsonify({"error": "Type must be 'income' or 'expense'"}), 400
+    
     try:
         expense_val = int(expense)
     except ValueError:
@@ -88,6 +100,8 @@ def update(transaction_id):
 
     # Update fields
     t.item = item
+    if type_:
+        t.type = type_
     t.category_id = category_id if category_id else None
     t.expense = expense_val
     t.transaction_at = transaction_at
@@ -100,6 +114,7 @@ def update(transaction_id):
         "transaction": {
             "id": t.id,
             "item": t.item,
+            "type": t.type,
             "category_id": t.category_id,
             "expense": t.expense,
             "date": t.transaction_at.strftime('%Y-%m-%d'),

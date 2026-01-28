@@ -9,6 +9,7 @@ class Transaction(db.Model):
 
 	id = db.Column(db.Integer, primary_key=True)
 	item = db.Column(db.String(128), nullable=False)
+	type = db.Column(db.String(10), nullable=False, default='expense')  # 'income' or 'expense'
 	category_id = db.Column(db.Integer, db.ForeignKey('transaction_categories.id', ondelete='SET NULL'), nullable=True)
 	expense = db.Column(db.Integer, nullable=False)
 	transaction_at = db.Column(db.DateTime, nullable=False)

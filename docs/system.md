@@ -26,43 +26,17 @@ System Design document helps us to realize the feature, architecture of the proj
 ├── requirements.txt
 ├── run.py
 ├── __pycache__/
-├── app/
+├── app/                  # Application directory
 │   ├── __init__.py
-│   ├── reports/
-│   │   ├── __init__.py
-│   │   └── routes.py
-│   ├── static/
+│   ├── static/           # Static files
 │   │   └── img/
-│   ├── templates/
-│   │   ├── base.html
-│   │   ├── index.html
-│   │   ├── reports/
-│   │   │   ├── expenses_breakdown.html
-│   │   │   ├── expenses_trend.html
-│   │   │   ├── index.html
-│   │   │   ├── mom_comparison.html
-│   │   │   ├── month_projection.html
-│   │   │   └── total_expenses.html
-│   │   └── transactions/
-│   │       ├── index.html
-│   │       └── transaction_modal.html
-│   └── transactions/
-│       ├── __init__.py
-│       ├── models.py
-│       └── routes.py
-├── docs/
-│   ├── roadmap.md
-│   └── system.md
-├── migrations/
-│   ├── alembic.ini
-│   ├── env.py
-│   ├── README
-│   ├── script.py.mako
-│   └── versions/
-└── scripts/
-    ├── seed_data.py
-    └── partitions/
-        └── batch_create_2026.sql
+│   ├── templates/        # Templates directory
+│   ├── module_1/         
+│   ├── .../              # Modules directory
+│   └── module_n/         
+├── docs/                 # Documentation directory
+├── migrations/           # Database migration files
+└── scripts/              # Utility scripts
 ```
 
 ## Business Domain

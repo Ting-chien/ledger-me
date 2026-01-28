@@ -2,6 +2,26 @@
 
 Feature roadmap shows features we want to add, update or fix. Requirements should be written in the scope of version and module, and will be marked as DONE if implemented.
 
+## v1.4.0
+
+Dashboard Page (`/`)
+- [] Move reports and charts in Report Page to Dashboard Page, the main point of Dashboard Page is to show a quick overview of the current month's expenses.
+
+Transaction Page (`/transactions`)
+- [x] Add a new column named `type` in model to show the type of the transaction (e.g., income, expense).
+- [x] Update transaction modal to allow users to select the type of the transaction.
+- [x] Update transaction list to show the type of the transaction.
+- [x] Remve the daily grouping in transaction list.
+
+Report Page (`/reports`)
+- [] Remove Report Page, move all reports to Dashboard Page.
+
+Wallet Page (`/wallet`) - I want to add a wallet page to show all my wallets and their balances.
+- [] Add a card to show the total balance of the history.
+- [] Add a bar chart to show the income and expense in the past 6 months.
+- [] Add a table to show the latest 6 transactions.
+- [] Add a pie chart to show the expense of each category in the past 6 months.
+
 ## v1.3.0 - Big UI improvement !
 
 Report Page (`/reports`)
